@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">File Change Space Check</title>
+  <rect x="3" y="3" width="54" height="54" fill="#165DFF" stroke="#171713" stroke-width="6"/>
+  <path d="M17 16h26v8H25v7h14v8H25v13h-8z" fill="#FFFDF6"/>
+  <path d="M46 8h10v10H46z" fill="#C8F04A" stroke="#171713" stroke-width="3"/>
+</svg>

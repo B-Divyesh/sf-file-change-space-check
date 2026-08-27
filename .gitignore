@@ -3,4 +3,6 @@ dist/
 .env
 *.log
 graphify-out/
+target/
+*.tmp
 .DS_Store

@@ -1,0 +1,26 @@
+{
+  "name": "file-change-space-check-site",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --config site/vite.config.ts",
+    "test:cli": "cargo test",
+    "test:site": "node --test site/site.test.mjs",
+    "test": "npm run test:cli && npm run test:site && npm run build:site",
+    "build:cli": "cargo build --release && node scripts/stage-binary.mjs",
+    "build:site": "node scripts/build-site.mjs",
+    "build": "npm run build:cli && npm run build:site",
+    "preview": "vite preview --config site/vite.config.ts",
+    "audit:a11y": "node scripts/a11y-audit.mjs"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "playwright": "^1.58.2",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

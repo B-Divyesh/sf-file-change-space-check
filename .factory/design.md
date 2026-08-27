@@ -59,8 +59,18 @@ and state changes are instantaneous.
 
 The hero asset is an original raster illustration showing cobalt file blocks
 being measured against a lime disk-capacity ruler, with one amber conflict block
-held aside. It contains no text so it remains useful at narrow sizes. It will be
-generated with the factory image deployment, converted locally to WebP, and
-kept below 300 KB. The final prompt, deployment metadata, dimensions, and file
-size are recorded here after generation. CSS icons are simple project-original
-geometric marks; no third-party icon library is used.
+held aside. It contains no text so it remains useful at narrow sizes. CSS icons
+are simple project-original geometric marks; no third-party icon library is used.
+
+- Generator: `/opt/fleet/lib/gen-image.sh`, deployment `factory-image`
+- Generated: 2026-08-27 at 1536×1024, high quality; converted locally to WebP
+  quality 72 with metadata stripped
+- Final: `site/public/assets/allocation-ledger.webp`, 172,482 bytes
+- Prompt: “Isometric neo-brutalist utility scene where cobalt blue file blocks
+  travel across a thick black measuring grid toward a cream disk platter with a
+  safety-lime capacity gauge; one amber conflict block is diverted into a side
+  slot before transfer. Warm paper field, graph-paper marks, hard offset shadows,
+  screen-printed editorial illustration, geometric forms, subtle halftone ink;
+  no people, logos, interface, gradients, text, letters, numbers, or watermark.”
+- License/provenance: generated specifically for this product through the Param
+  Factory image deployment; no third-party source image was used.
