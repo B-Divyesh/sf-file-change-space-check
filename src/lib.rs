@@ -917,6 +917,67 @@ mod tests {
     }
 
     #[test]
+    fn estimates_match_actual_dense_copy_for_every_policy() {
+        let fixture = Fixture::new();
+        fs::create_dir(fixture.0.join("source")).unwrap();
+        fs::write(fixture.0.join("source/new.bin"), vec![0xA5; 1024 * 1024]).unwrap();
+        fs::write(
+            fixture.0.join("source/conflict.bin"),
+            vec![0x5A; 2 * 1024 * 1024],
+        )
+        .unwrap();
+
+        for policy in [
+            ConflictPolicy::Overwrite,
+            ConflictPolicy::Skip,
+            ConflictPolicy::KeepBoth,
+        ] {
+            let destination = fixture.0.join(format!("destination-{policy:?}"));
+            fs::create_dir(&destination).unwrap();
+            fs::write(destination.join("conflict.bin"), vec![0x11; 512 * 1024]).unwrap();
+            let before = allocated_regular_files(&destination);
+            let manifest = plan(&PlanOptions {
+                source: fixture.0.join("source"),
+                destination: destination.clone(),
+                policy,
+                sparse: SparseMode::Expand,
+                check_space: true,
+            })
+            .unwrap();
+
+            fs::copy(
+                fixture.0.join("source/new.bin"),
+                destination.join("new.bin"),
+            )
+            .unwrap();
+            match policy {
+                ConflictPolicy::Overwrite => {
+                    fs::copy(
+                        fixture.0.join("source/conflict.bin"),
+                        destination.join("conflict.bin"),
+                    )
+                    .unwrap();
+                }
+                ConflictPolicy::Skip => {}
+                ConflictPolicy::KeepBoth => {
+                    fs::copy(
+                        fixture.0.join("source/conflict.bin"),
+                        destination.join("conflict (copy 1).bin"),
+                    )
+                    .unwrap();
+                }
+            }
+            let actual = signed_difference(allocated_regular_files(&destination), before);
+            let estimated = manifest.summary.net_change_bytes_upper;
+            let tolerance = ((actual.unsigned_abs() as f64) * 0.02).ceil() as i64;
+            assert!(
+                (estimated - actual).abs() <= tolerance,
+                "{policy:?}: estimated {estimated}, actual {actual}, tolerance {tolerance}"
+            );
+        }
+    }
+
+    #[test]
     fn upper_bound_controls_space_verdict() {
         assert_eq!(
             space_verdict(Some(10_000), 10_000),
@@ -927,5 +988,16 @@ mod tests {
             SpaceVerdict::Insufficient
         );
         assert_eq!(space_verdict(None, 0), SpaceVerdict::Unchecked);
+    }
+
+    fn allocated_regular_files(directory: &Path) -> u64 {
+        fs::read_dir(directory)
+            .unwrap()
+            .map(|entry| entry.unwrap())
+            .filter_map(|entry| {
+                let metadata = entry.metadata().unwrap();
+                metadata.is_file().then(|| metadata.blocks() * 512)
+            })
+            .sum()
     }
 }

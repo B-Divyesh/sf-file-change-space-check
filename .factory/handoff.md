@@ -38,7 +38,8 @@ cargo package
 
 ## Verification on 2026-08-27
 
-- Rust: 6 unit tests, 3 CLI integration tests, and 1 doctest passed.
+- Rust: 7 unit tests (including actual-copy allocation checks for every policy),
+  3 CLI integration tests, and 1 doctest passed.
 - Site: 4 structural/budget tests passed; `npm audit` reported 0 vulnerabilities.
 - `cargo clippy --all-targets -- -D warnings`: passed.
 - Playwright browser smoke test: no page/console errors; title, `lang`, one h1,
