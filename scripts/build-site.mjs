@@ -1,10 +1,19 @@
 import { build } from "vite";
-import { readdir, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, readdir, stat, writeFile } from "node:fs/promises";
 import { resolve, relative, sep } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
 const output = resolve(root, "dist/site");
 await build({ configFile: resolve(root, "site/vite.config.ts") });
+
+const cliArtifact = resolve(root, "dist/downloads/fcsc");
+try {
+  await stat(cliArtifact);
+  await mkdir(resolve(output, "downloads"), { recursive: true });
+  await copyFile(cliArtifact, resolve(output, "downloads/fcsc-linux-x86_64"));
+} catch (error) {
+  if (error.code !== "ENOENT") throw error;
+}
 
 async function filesBelow(directory) {
   const entries = await readdir(directory, { withFileTypes: true });

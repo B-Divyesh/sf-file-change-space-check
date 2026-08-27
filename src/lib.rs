@@ -152,6 +152,21 @@ struct Planner {
 ///
 /// A source directory maps its contents into the destination root. A source
 /// file maps to `destination/source-file-name`.
+///
+/// ```no_run
+/// use file_change_space_check::{plan, ConflictPolicy, PlanOptions, SparseMode};
+/// use std::path::PathBuf;
+///
+/// let manifest = plan(&PlanOptions {
+///     source: PathBuf::from("./camera-roll"),
+///     destination: PathBuf::from("/mnt/archive"),
+///     policy: ConflictPolicy::Overwrite,
+///     sparse: SparseMode::Auto,
+///     check_space: true,
+/// })?;
+/// println!("{:?}", manifest.verdict);
+/// # Ok::<(), Box<dyn std::error::Error>>(())
+/// ```
 pub fn plan(options: &PlanOptions) -> Result<Manifest, PlanError> {
     let source_input = absolute_lexical(&options.source)?;
     let source_meta = metadata(&source_input)?;

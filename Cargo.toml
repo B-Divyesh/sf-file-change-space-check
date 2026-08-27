@@ -10,6 +10,15 @@ homepage = "https://file-change-space-check.sociobot.in"
 keywords = ["cli", "filesystem", "disk-space", "copy", "manifest"]
 categories = ["command-line-utilities", "filesystem"]
 readme = "README.md"
+include = [
+  "/src/**",
+  "/tests/**",
+  "/Cargo.toml",
+  "/Cargo.lock",
+  "/README.md",
+  "/LICENSE",
+  "/CHANGELOG.md"
+]
 
 [[bin]]
 name = "fcsc"

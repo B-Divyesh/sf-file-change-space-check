@@ -7,7 +7,7 @@
     "dev": "vite --config site/vite.config.ts",
     "test:cli": "cargo test",
     "test:site": "node --test site/site.test.mjs",
-    "test": "npm run test:cli && npm run test:site && npm run build:site",
+    "test": "npm run test:cli && npm run test:site && npm run build",
     "build:cli": "cargo build --release && node scripts/stage-binary.mjs",
     "build:site": "node scripts/build-site.mjs",
     "build": "npm run build:cli && npm run build:site",
