@@ -1,0 +1,13 @@
+{
+  "slug": "file-change-space-check",
+  "title": "File Change Space Check",
+  "artifact_class": "cli",
+  "job": "Estimate free space and conflicts before copying, extracting, or reorganizing a large local folder.",
+  "scope": "A read-only desktop CLI that scans metadata, applies overwrite, skip, or keep-both policy, estimates net bytes and temporary headroom, and emits a deterministic action manifest.",
+  "constraints": [
+    "Metadata scan only by default",
+    "Account for sparse files and filesystem allocation uncertainty",
+    "Never execute the manifest or assume permissions"
+  ],
+  "monetization": "free"
+}
