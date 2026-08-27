@@ -1,5 +1,26 @@
 # Handoff — File Change Space Check v0.1.0
 
+## Verification status: FAIL — do not release
+
+Independent verification of candidate
+`9e99be7b34c44f954f73d4e5411bac12adcb3923` on 2026-08-27 failed. See
+[`verification.md`](verification.md) for full commands and evidence.
+
+- **P0 deployment:** `https://file-change-space-check.sociobot.in` presents a
+  certificate for an Azure hostname rather than the product hostname; verified
+  HTTPS fails. Diagnostic insecure requests show `/`, the download,
+  `/privacy/`, and `/sw.js` as 404, so the candidate is not live end to end.
+- **P1 CLI safety:** a destination reached through a symlink into the source
+  tree is accepted and planned, bypassing the contained-destination guard.
+- **P1 accessibility:** the dark theme has four serious axe color-contrast
+  findings in the proof-strip labels.
+- **P2 verification:** `npm run audit:a11y` fails on a clean clone because its
+  expected `.factory/evidence/` directory is absent.
+
+Local build, Rust test suite, CLI package/install smoke test, light-mode axe,
+PWA offline reload, privacy/request audit, and Lighthouse otherwise passed;
+these do not override the blockers. Fix and reverify before deployment.
+
 ## What shipped
 
 - A read-only Rust CLI (`fcsc`) that plans a source tree into a destination,
@@ -36,7 +57,10 @@ cargo package
 - `dist/site/index.html` — static deployment root
 - `dist/site/downloads/fcsc-linux-x86_64` — website download
 
-## Verification on 2026-08-27
+## Builder-reported verification on 2026-08-27 (superseded)
+
+The following builder report is retained for historical context only. The
+independent verification above found release blockers and is authoritative.
 
 - Rust: 7 unit tests (including actual-copy allocation checks for every policy),
   3 CLI integration tests, and 1 doctest passed.
