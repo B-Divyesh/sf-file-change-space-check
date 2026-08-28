@@ -184,21 +184,26 @@ pub fn plan(options: &PlanOptions) -> Result<Manifest, PlanError> {
     }
 
     let destination = absolute_lexical(&options.destination)?;
-    if let Ok(meta) = fs::symlink_metadata(&destination)
-        && !meta.is_dir()
-    {
-        return Err(PlanError::InvalidInput(format!(
-            "destination {} exists but is not a directory",
-            destination.display()
-        )));
+    if fs::symlink_metadata(&destination).is_ok() {
+        let meta = fs::metadata(&destination).map_err(|source| PlanError::Io {
+            path: destination.clone(),
+            source,
+        })?;
+        if !meta.is_dir() {
+            return Err(PlanError::InvalidInput(format!(
+                "destination {} exists but is not a directory",
+                destination.display()
+            )));
+        }
     }
+    let resolved_destination = resolve_destination_ancestry(&destination)?;
     if source_meta.is_dir() {
-        if destination == source {
+        if resolved_destination == source {
             return Err(PlanError::InvalidInput(
                 "source and destination directories must be different".into(),
             ));
         }
-        if destination.starts_with(&source) {
+        if resolved_destination.starts_with(&source) {
             return Err(PlanError::InvalidInput(
                 "destination cannot be inside the source tree".into(),
             ));
@@ -743,7 +748,7 @@ fn absolute_lexical(path: &Path) -> Result<PathBuf, PlanError> {
 fn nearest_existing_ancestor(path: &Path) -> Result<PathBuf, PlanError> {
     let mut candidate = path.to_path_buf();
     loop {
-        match fs::symlink_metadata(&candidate) {
+        match fs::metadata(&candidate) {
             Ok(meta) if meta.is_dir() => return Ok(candidate),
             Ok(_) => {
                 candidate.pop();
@@ -764,6 +769,21 @@ fn nearest_existing_ancestor(path: &Path) -> Result<PathBuf, PlanError> {
             }
         }
     }
+}
+
+/// Resolve every existing destination component while leaving a missing tail
+/// lexical. This catches paths that enter the source through a symlink before
+/// the requested destination exists.
+fn resolve_destination_ancestry(destination: &Path) -> Result<PathBuf, PlanError> {
+    let ancestor = nearest_existing_ancestor(destination)?;
+    let resolved_ancestor = canonical_existing(&ancestor)?;
+    let tail = destination.strip_prefix(&ancestor).map_err(|_| {
+        PlanError::InvalidInput(format!(
+            "destination {} has an invalid existing ancestor",
+            destination.display()
+        ))
+    })?;
+    Ok(resolved_ancestor.join(tail))
 }
 
 struct FilesystemInfo {
@@ -988,6 +1008,32 @@ mod tests {
             SpaceVerdict::Insufficient
         );
         assert_eq!(space_verdict(None, 0), SpaceVerdict::Unchecked);
+    }
+
+    #[test]
+    fn rejects_destination_inside_source_through_symlinked_ancestor() {
+        use std::os::unix::fs::symlink;
+
+        let fixture = Fixture::new();
+        let source = fixture.0.join("source");
+        fs::create_dir(&source).unwrap();
+        fs::write(source.join("item.bin"), b"payload").unwrap();
+        symlink(&source, fixture.0.join("source-alias")).unwrap();
+
+        let error = plan(&PlanOptions {
+            source,
+            destination: fixture.0.join("source-alias/new-subdir"),
+            policy: ConflictPolicy::Overwrite,
+            sparse: SparseMode::Auto,
+            check_space: false,
+        })
+        .unwrap_err();
+
+        assert!(matches!(error, PlanError::InvalidInput(_)));
+        assert_eq!(
+            error.to_string(),
+            "destination cannot be inside the source tree"
+        );
     }
 
     fn allocated_regular_files(directory: &Path) -> u64 {

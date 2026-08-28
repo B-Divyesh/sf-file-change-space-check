@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { chromium } from "playwright";
 import { createServer } from "node:http";
-import { readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { extname, resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "../dist/site");
@@ -24,19 +24,23 @@ const origin = `http://127.0.0.1:${address.port}`;
 const browser = await chromium.launch();
 const findings = [];
 try {
-  for (const path of ["/", "/privacy/", "/terms/"]) {
-    const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
-    const page = await context.newPage();
-    await page.goto(`${origin}${path}`, { waitUntil: "networkidle" });
-    const result = await new AxeBuilder({ page }).analyze();
-    findings.push({ path, violations: result.violations });
-    await context.close();
+  for (const colorScheme of ["light", "dark"]) {
+    for (const path of ["/", "/privacy/", "/terms/"]) {
+      const context = await browser.newContext({ colorScheme, viewport: { width: 390, height: 844 } });
+      const page = await context.newPage();
+      await page.goto(`${origin}${path}`, { waitUntil: "networkidle" });
+      const result = await new AxeBuilder({ page }).analyze();
+      findings.push({ path, colorScheme, violations: result.violations });
+      await context.close();
+    }
   }
 } finally {
   await browser.close();
   server.close();
 }
-await writeFile(resolve(root, "../../.factory/evidence/axe.json"), `${JSON.stringify(findings, null, 2)}\n`);
+const evidenceDirectory = resolve(root, "../../.factory/evidence");
+await mkdir(evidenceDirectory, { recursive: true });
+await writeFile(resolve(evidenceDirectory, "axe.json"), `${JSON.stringify(findings, null, 2)}\n`);
 const serious = findings.flatMap(({ path, violations }) => violations.filter(({ impact }) => impact === "serious" || impact === "critical").map(({ id, impact }) => ({ path, id, impact })));
 console.log(JSON.stringify({ pages: findings.length, violations: findings.reduce((sum, page) => sum + page.violations.length, 0), serious }, null, 2));
 if (serious.length > 0) process.exitCode = 1;

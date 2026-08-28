@@ -81,3 +81,21 @@ fn invalid_source_is_an_actionable_error() {
     assert_eq!(output.status.code(), Some(1));
     assert!(String::from_utf8_lossy(&output.stderr).contains("cannot read"));
 }
+
+#[test]
+fn invalid_policy_uses_the_documented_input_error_exit_code() {
+    let fixture = Fixture::new();
+    let output = Command::new(binary())
+        .args([
+            fixture.0.join("source").to_str().unwrap(),
+            fixture.0.join("destination").to_str().unwrap(),
+            "--policy",
+            "not-a-policy",
+            "--json",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(1));
+    assert!(String::from_utf8_lossy(&output.stderr).contains("invalid value 'not-a-policy'"));
+    assert!(output.stdout.is_empty());
+}

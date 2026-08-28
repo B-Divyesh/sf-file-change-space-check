@@ -1,4 +1,4 @@
-use clap::{Parser, ValueEnum};
+use clap::{Parser, ValueEnum, error::ErrorKind};
 use file_change_space_check::{
     ConflictPolicy, Manifest, PlanOptions, SpaceVerdict, SparseMode, plan,
 };
@@ -50,7 +50,17 @@ struct Cli {
 }
 
 fn main() -> ExitCode {
-    let cli = Cli::parse();
+    let cli = match Cli::try_parse() {
+        Ok(cli) => cli,
+        Err(error) => {
+            let exit_code = match error.kind() {
+                ErrorKind::DisplayHelp | ErrorKind::DisplayVersion => 0,
+                _ => 1,
+            };
+            let _ = error.print();
+            return ExitCode::from(exit_code);
+        }
+    };
     let options = PlanOptions {
         source: cli.source,
         destination: cli.destination,

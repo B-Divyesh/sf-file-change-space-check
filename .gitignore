@@ -6,3 +6,4 @@ graphify-out/
 target/
 *.tmp
 .DS_Store
+.factory/evidence/

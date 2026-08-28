@@ -26,7 +26,9 @@ Light mode is the primary, explicitly painted treatment.
 
 Dark treatment follows the user's preference with `#141612` canvas,
 `#20231C` surfaces, `#F7F1DF` text, cobalt lightened to `#76A4FF`, and lime
-held at `#C8F04A`. Status always includes an icon and words, never color alone.
+held at `#C8F04A`. The small proof-strip numbers invert to the dark canvas,
+so lime remains legible at text contrast rather than sitting on light ink.
+Status always includes an icon and words, never color alone.
 
 ## Typography and spacing
 

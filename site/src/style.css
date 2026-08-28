@@ -213,6 +213,7 @@ footer nav { display: flex; gap: 20px; font: 700 13px var(--mono); }
   body { background-image: linear-gradient(rgba(247,241,223,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(247,241,223,.04) 1px, transparent 1px); }
   .brand-mark, .stamp { color: #141612; border-color: var(--ink); }
   .network-state, .button-secondary, .copy-button, .proof-strip, .figure-label, .terminal-bar { color: #141612; border-color: var(--ink); }
+  .proof-strip b { background: #141612; color: var(--lime); }
   .button-primary, .usage-section { color: #141612; }
   .button-primary { border-color: var(--ink); }
   .usage-section .button-secondary { border-color: #141612; box-shadow: 4px 4px 0 #141612; }
