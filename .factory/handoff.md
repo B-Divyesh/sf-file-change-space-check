@@ -1,25 +1,24 @@
 # Handoff — File Change Space Check v0.1.0
 
-## Verification status: FAIL — do not release
+## Independent verification status: FAIL — do not release
 
-Independent verification of candidate
-`9e99be7b34c44f954f73d4e5411bac12adcb3923` on 2026-08-27 failed. See
-[`verification.md`](verification.md) for full commands and evidence.
+On 2026-08-28, clean-checkout verification of candidate
+`9e99be7b34c44f954f73d4e5411bac12adcb3923` found three P1 blockers:
 
-- **P0 deployment:** `https://file-change-space-check.sociobot.in` presents a
-  certificate for an Azure hostname rather than the product hostname; verified
-  HTTPS fails. Diagnostic insecure requests show `/`, the download,
-  `/privacy/`, and `/sw.js` as 404, so the candidate is not live end to end.
-- **P1 CLI safety:** a destination reached through a symlink into the source
-  tree is accepted and planned, bypassing the contained-destination guard.
-- **P1 accessibility:** the dark theme has four serious axe color-contrast
-  findings in the proof-strip labels.
-- **P2 verification:** `npm run audit:a11y` fails on a clean clone because its
-  expected `.factory/evidence/` directory is absent.
+- A destination that enters the source through a symlinked ancestor is accepted
+  and planned, bypassing the source-containment safety guard.
+- Invalid `--policy` input exits `2`, colliding with the documented
+  insufficient-space result instead of the documented invalid-input exit `1`.
+- Dark mode has four serious Axe color-contrast violations at 390 px.
 
-Local build, Rust test suite, CLI package/install smoke test, light-mode axe,
-PWA offline reload, privacy/request audit, and Lighthouse otherwise passed;
-these do not override the blockers. Fix and reverify before deployment.
+The previous deployment-only failure is no longer reproducible: fresh HTTPS
+checks passed and all checked live artifacts byte-match this candidate build.
+Tests, builds, package/install, CLI flows, privacy/request checks, PWA offline
+reload, caching, and performance otherwise passed. The prescribed
+`npm run audit:a11y` also fails in a clean checkout because it does not create
+`.factory/evidence/` before writing its report. See
+[`verification-2.md`](verification-2.md) for commands, evidence, severity,
+and required fixes.
 
 ## What shipped
 
