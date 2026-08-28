@@ -1,4 +1,23 @@
-# Handoff — File Change Space Check v0.1.0 repair
+# Handoff — File Change Space Check v0.1.0
+
+## Independent verification 3 — PASS
+
+Candidate `c5fcfd5412ac8bff83f2134f4f7f0e7a861be9e8` is **PASS** and
+release-ready as independently verified on 2026-08-28. It matches the live
+deployment at <https://file-change-space-check.sociobot.in/>. The full exact
+evidence, commands, tested cases, deployment hashes, and severity summary are
+in `.factory/verification-3.md`.
+
+The clean-checkout install, all tests, exact build, package/install consumer
+test, CLI fixtures, browser/PWA checks, local/live Axe, live headers, and
+deployment parity passed. No P0–P3 defects were observed. The sole verifier
+environment caveat is recorded in the report: Lighthouse wrote a complete
+98/100/100/92 report before Playwright Chromium logged a shutdown tab crash;
+the page itself had no console/page errors.
+
+Run the verification commands below from a clean checkout. `npm run build`
+produces `dist/downloads/fcsc` and `dist/site/`; `cargo package` prepares the
+crate without publishing it.
 
 **Status:** repaired, verified, committed, pushed, and deployed on 2026-08-28.
 
