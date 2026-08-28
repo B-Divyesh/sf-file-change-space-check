@@ -1,48 +1,98 @@
-# Handoff — File Change Space Check v0.1.0
+# Handoff — File Change Space Check v0.1.0 repair
 
-## Independent verification status: FAIL — do not release
+**Status:** repaired, verified, committed, pushed, and deployed on 2026-08-28.
 
-On 2026-08-28, clean-checkout verification of candidate
-`9e99be7b34c44f954f73d4e5411bac12adcb3923` found three P1 blockers:
+- Repair commit: `e20c763ec33b537724d86d3d2a4cb4a46012f7c6`
+- Branch: `main`
+- Live site: <https://file-change-space-check.sociobot.in/>
+- Artifact/deployment class: Rust CLI with static Vite documentation site
 
-- A destination that enters the source through a symlinked ancestor is accepted
-  and planned, bypassing the source-containment safety guard.
-- Invalid `--policy` input exits `2`, colliding with the documented
-  insufficient-space result instead of the documented invalid-input exit `1`.
-- Dark mode has four serious Axe color-contrast violations at 390 px.
+## Release-blocking repairs
 
-The previous deployment-only failure is no longer reproducible: fresh HTTPS
-checks passed and all checked live artifacts byte-match this candidate build.
-Tests, builds, package/install, CLI flows, privacy/request checks, PWA offline
-reload, caching, and performance otherwise passed. The prescribed
-`npm run audit:a11y` also fails in a clean checkout because it does not create
-`.factory/evidence/` before writing its report. See
-[`verification-2.md`](verification-2.md) for commands, evidence, severity,
-and required fixes.
+1. **Symlinked destination ancestry is now physically resolved before source
+   containment is checked.** A destination such as
+   `source-alias/new-subdir`, where `source-alias` links to the source, now
+   exits `1` with `destination cannot be inside the source tree`. The emitted
+   manifest continues to retain the lexical destination supplied by the user
+   for normal, valid plans.
+2. **Malformed CLI invocation now uses the documented input-error code.**
+   Clap parse errors, including `--policy not-a-policy`, exit `1`; `--help`
+   and `--version` still exit `0`; capacity insufficiency remains exit `2`.
+3. **Dark proof-strip labels are accessible.** The small `01`–`04` labels use
+   lime on the dark canvas in dark mode, rather than lime on light ink.
+4. **The accessibility audit works in a clean checkout.** It creates its
+   evidence directory itself and now scans all three pages at 390×844 in both
+   light and dark color schemes. Generated evidence is ignored.
 
-## What shipped
+Regression coverage was added for the symlink-ancestor rejection, invalid
+policy exit code/stdout behavior, dark proof-label treatment, and audit output
+directory/theme coverage.
 
-- A read-only Rust CLI (`fcsc`) that plans a source tree into a destination,
-  with required `overwrite`, `skip`, and `keep-both` conflict policies.
-- Deterministic, versioned JSON manifests (`--json` and `--manifest`) plus a
-  compact human report and stable exit codes: 0 safe, 1 input/scan error,
-  2 insufficient space, 3 unchecked space.
-- Lower/upper allocation bounds for sparse files, destination block-size and
-  available-space checks, conservative pre-reclamation headroom, recursive type
-  conflict handling, symlink metadata, and explicit special-file skips.
-- A Vite/TypeScript documentation site at `dist/site` with a keyboard-friendly
-  live policy simulator, install/download path, honest limits, offline cache,
-  dark mode, 390 px layout, privacy page, and terms page.
-- An original 1536×1024 allocation-ledger hero generated for this product and
-  optimized to 172,482-byte WebP. Prompt and provenance are in
-  `.factory/design.md`.
-- README usage contract, MIT license, changelog, typed public Rust API with a
-  compiling doctest, clean-clone scripts, and a registry-ready crate definition.
+## Verification evidence
 
-## Run and verify
+Fresh clone at commit `e20c763ec33b537724d86d3d2a4cb4a46012f7c6`:
 
 ```sh
-npm install
+npm ci
+npm test
+PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers npm run audit:a11y
+cargo fmt --check
+cargo clippy --all-targets -- -D warnings
+cargo package
+```
+
+All passed. `npm test` includes 8 Rust library tests, 4 CLI integration tests,
+1 doctest, 6 site tests, and an exact production build. The accessibility
+audit scanned 6 page/theme combinations with 0 violations and 0 serious or
+critical findings. `npm audit --omit=dev` reported 0 vulnerabilities. There is
+no separate TypeScript type-check or lint configuration; Vite's production
+build and the TypeScript source compile completed successfully.
+
+The production binary independently reproduced the repaired contract:
+
+```text
+symlinked destination inside source: exit 1
+invalid --policy value:               exit 1
+fcsc --help:                          exit 0
+```
+
+`cargo package --allow-dirty` and `cargo package` both verified successfully.
+A consumer install from the packaged crate (`cargo install --path ...`) emitted
+a schema-1, `sufficient` JSON manifest with the installed `fcsc` binary.
+Publishing was intentionally not performed; the registry owner can publish
+with `cargo package` followed by its normal release command.
+
+Browser checks against the production build passed at 1440×1000 and 390×844:
+
+- first Tab reaches the visible skip link;
+- no horizontal overflow or console/page errors;
+- the mobile simulator announces invalid `-1` input and recovers to “Safe to
+  start” at `22` GB;
+- service-worker-controlled offline reload returns `200`;
+- reduced motion is covered by the stylesheet's reduced-motion treatment.
+
+Live post-deploy checks passed:
+
+- `/`, `/privacy/`, `/terms/`, `/sw.js`, and the Linux download return `200`;
+- the live `index.html`, `sw.js`, and `downloads/fcsc-linux-x86_64` byte-match
+  the local build (SHA-256 comparison);
+- dark 390 px Axe on `/`, `/privacy/`, and `/terms/` found 0 serious/critical
+  violations and no console errors;
+- normal HTTPS validation presents
+  `CN=file-change-space-check.sociobot.in` (GeoTrust TLS RSA CA G1);
+- live headers include same-origin CSP, `Referrer-Policy: no-referrer`,
+  `X-Content-Type-Options: nosniff`, and restrictive camera/microphone/
+  geolocation permissions policy.
+
+Live mobile Lighthouse (Chrome headless, 2026-08-28): Performance **99**,
+Accessibility **100**, Best Practices **100**, SEO **92**; FCP 1.1 s, LCP
+1.8 s, CLS 0, TBT 110 ms. Built assets: JS 3,872 bytes, CSS 14,391 bytes,
+hero WebP 172,482 bytes. These are within the product budgets.
+
+## Run, build, and deploy
+
+```sh
+npm ci
 npm test
 npm run build
 PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers npm run audit:a11y
@@ -50,41 +100,19 @@ cargo clippy --all-targets -- -D warnings
 cargo package
 ```
 
-`npm run build` is the release command. It creates:
+`npm run build` creates `dist/downloads/fcsc` and the deployable static site at
+`dist/site/`. The production deployment used:
 
-- `dist/downloads/fcsc` — stripped Linux x86_64 CLI
-- `dist/site/index.html` — static deployment root
-- `dist/site/downloads/fcsc-linux-x86_64` — website download
+```sh
+/opt/fleet/lib/deploy-static.sh file-change-space-check /work/repo/dist/site
+```
 
-## Builder-reported verification on 2026-08-27 (superseded)
+## Remaining product limits
 
-The following builder report is retained for historical context only. The
-independent verification above found release blockers and is authoritative.
-
-- Rust: 7 unit tests (including actual-copy allocation checks for every policy),
-  3 CLI integration tests, and 1 doctest passed.
-- Site: 4 structural/budget tests passed; `npm audit` reported 0 vulnerabilities.
-- `cargo clippy --all-targets -- -D warnings`: passed.
-- Playwright browser smoke test: no page/console errors; title, `lang`, one h1,
-  main landmark, image alternatives, and button names present at desktop and
-  390×844 mobile viewports.
-- Axe 4.13 Playwright scan on `/`, `/privacy/`, and `/terms/`: 0 violations.
-- Lighthouse 13 mobile/simulated throttling: Performance 100, Accessibility
-  100, Best Practices 100, SEO 100; LCP 1.8 s, FCP 1.0 s, CLS 0, TBT 0 ms.
-  INP is not available for a synthetic no-interaction run.
-- Initial transfer: 197 KiB. Built assets: JS 3,872 bytes, CSS 14,339 bytes,
-  hero WebP 172,482 bytes. CLI binary: 719,072 bytes.
-- `cargo package`: verified locally; publishing intentionally not performed.
-
-## Known gaps and next steps
-
-- v0.1 targets Unix metadata APIs. Linux is shipped; macOS is supported from
-  source but needs a factory-built release artifact. Windows support is next.
-- Metadata cannot prove that the eventual copy command has write permission or
-  will preserve sparse holes. The manifest calls both out, and `auto` uses the
-  expanded upper bound for the verdict.
-- Hard-link preservation, reflinks, compression, quotas, and reserved filesystem
-  space are copy-tool/filesystem-specific and are not modeled. The conservative
-  upper bound remains the safe default.
-- The browser simulator is an explanatory fixed fixture, not a browser filesystem
-  scanner. Real paths remain local to the CLI by design.
+- v0.1 uses Unix metadata APIs. Linux is shipped; macOS is supported from
+  source. Windows support is not yet implemented.
+- The manifest is deliberately read-only and cannot prove eventual copy-tool
+  permissions or sparse-hole preservation.
+- Hard links, reflinks, compression, quotas, and reserved filesystem space are
+  copy-tool/filesystem-specific and are not modeled. The conservative upper
+  allocation bound remains the safe default.
