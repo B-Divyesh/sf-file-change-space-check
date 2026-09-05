@@ -6,13 +6,17 @@
   "scripts": {
     "dev": "vite --config site/vite.config.ts",
     "test:cli": "cargo test",
-    "test:site": "node --test site/site.test.mjs",
-    "test": "npm run test:cli && npm run test:site && npm run build",
+    "test:site": "node --test --test-concurrency=1 site/site.test.mjs",
+    "test:claims": "node --test --test-concurrency=1 tests/claims.test.mjs",
+    "test": "npm run build && npm run typecheck && npm run test:cli && npm run test:site && npm run test:claims",
+    "claim": "node scripts/run-claim.mjs",
     "build:cli": "cargo build --release && node scripts/stage-binary.mjs",
     "build:site": "node scripts/build-site.mjs",
     "build": "npm run build:cli && npm run build:site",
+    "typecheck": "tsc -p site/tsconfig.json",
     "preview": "vite preview --config site/vite.config.ts",
-    "audit:a11y": "node scripts/a11y-audit.mjs"
+    "audit:a11y": "node scripts/a11y-audit.mjs",
+    "verify:url": "bash scripts/verify-url.sh"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",

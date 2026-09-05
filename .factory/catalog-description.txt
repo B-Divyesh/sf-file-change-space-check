@@ -1,0 +1,1 @@
+Check free space and conflicts before copying a large local folder.

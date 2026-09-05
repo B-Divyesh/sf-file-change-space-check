@@ -1,0 +1,121 @@
+[
+  {
+    "id": "demo-sandbox",
+    "claim": "fcsc --demo runs a bundled sample in a new temporary sandbox.",
+    "where": "landing recording, demo page, README",
+    "test": "npm run claim -- @claim:demo-sandbox",
+    "sandbox": "fresh working directory; assert realistic actions, printed temp path, manifest, and no working-directory changes"
+  },
+  {
+    "id": "read-only-plan",
+    "claim": "Planning changes no source or destination files.",
+    "where": "landing facts, CLI output, README",
+    "test": "npm run claim -- @claim:read-only-plan",
+    "sandbox": "temporary conflicting trees; hash and compare both trees before and after an overwrite plan"
+  },
+  {
+    "id": "metadata-only",
+    "claim": "The default scan reads metadata without requiring regular file contents.",
+    "where": "landing facts, privacy, README",
+    "test": "npm run claim -- @claim:metadata-only",
+    "sandbox": "plan an unreadable regular file as an unprivileged user and assert its metadata action"
+  },
+  {
+    "id": "conflict-policies",
+    "claim": "Overwrite, skip, and keep-both produce policy-specific plans.",
+    "where": "landing how-it-works, demo, README",
+    "test": "npm run claim -- @claim:conflict-policies",
+    "sandbox": "temporary conflict with an occupied copy suffix; assert overwrite, skip, and next keep-both name"
+  },
+  {
+    "id": "sparse-bounds",
+    "claim": "Sparse files receive conservative lower and upper allocation bounds.",
+    "where": "landing limits, README",
+    "test": "npm run claim -- @claim:sparse-bounds",
+    "sandbox": "64 MiB sparse file; assert lower allocation is below the expanded upper bound"
+  },
+  {
+    "id": "deterministic-json",
+    "claim": "Unchanged inputs produce byte-identical, sorted JSON plans.",
+    "where": "landing how-it-works, README",
+    "test": "npm run claim -- @claim:deterministic-json",
+    "sandbox": "same unsorted fixture planned twice; compare stdout bytes and action order"
+  },
+  {
+    "id": "upper-bound-verdict",
+    "claim": "The safer sparse upper bound controls the space verdict.",
+    "where": "README sparse-files section",
+    "test": "npm run claim -- @claim:upper-bound-verdict",
+    "sandbox": "planner boundary fixture where free space is between lower and upper requirements"
+  },
+  {
+    "id": "json-manifest",
+    "claim": "fcsc prints JSON and can save the same schema-1 manifest.",
+    "where": "landing how-it-works, README usage",
+    "test": "npm run claim -- @claim:json-manifest",
+    "sandbox": "temporary source; compare parsed stdout with the saved manifest"
+  },
+  {
+    "id": "exit-codes",
+    "claim": "Exit codes are 0 safe, 1 invalid, 2 insufficient, and 3 unchecked.",
+    "where": "README usage",
+    "test": "npm run claim -- @claim:exit-codes",
+    "sandbox": "temporary normal, invalid, oversized sparse, and no-space-check runs"
+  },
+  {
+    "id": "source-install",
+    "claim": "cargo install --path . --locked installs fcsc from a source checkout.",
+    "where": "landing install section, README",
+    "test": "npm run claim -- @claim:source-install",
+    "sandbox": "fresh Cargo consumer root; install and execute fcsc --version"
+  },
+  {
+    "id": "cli-local-only",
+    "claim": "The CLI works without accounts, telemetry, or network access.",
+    "where": "landing limits, privacy, README",
+    "test": "npm run claim -- @claim:cli-local-only",
+    "sandbox": "run the real binary with an injected socket guard and assert no socket call"
+  },
+  {
+    "id": "browser-demo",
+    "claim": "The browser demo uses fixed sample data, accepts no local files, resets, and saves nothing.",
+    "where": "demo banner, demo copy, privacy",
+    "test": "npm run claim -- @claim:browser-demo",
+    "sandbox": "fresh phone browser context; change policy, inspect output, reset, and inspect browser storage"
+  },
+  {
+    "id": "site-privacy",
+    "claim": "The site uses no analytics, cookies, remote fonts, or third-party runtime code.",
+    "where": "privacy",
+    "test": "npm run claim -- @claim:site-privacy",
+    "sandbox": "record all requests and cookies during the complete home-to-demo flow"
+  },
+  {
+    "id": "offline-demo",
+    "claim": "The documentation and sample demo reload offline after the first visit.",
+    "where": "site status, privacy, README",
+    "test": "npm run claim -- @claim:offline-demo",
+    "sandbox": "dedicated browser context; wait for service worker, go offline, and reload /demo"
+  },
+  {
+    "id": "non-executable-manifest",
+    "claim": "The manifest is data and never executes file transfers.",
+    "where": "landing limits, terms, README",
+    "test": "npm run claim -- @claim:non-executable-manifest",
+    "sandbox": "save a manifest, assert it is non-executable, and compare the destination tree"
+  },
+  {
+    "id": "estimate-within-two-percent",
+    "claim": "Dense fixture estimates stay within 2% of actual allocated-byte changes.",
+    "where": "README accuracy section",
+    "test": "npm run claim -- @claim:estimate-within-two-percent",
+    "sandbox": "copy dense conflict fixtures under all three policies and measure allocation deltas"
+  },
+  {
+    "id": "linux-download",
+    "claim": "The Linux download is the tested fcsc 0.1.0 release binary.",
+    "where": "landing install section, README",
+    "test": "npm run claim -- @claim:linux-download",
+    "sandbox": "compare staged download bytes with the release binary and execute --version"
+  }
+]

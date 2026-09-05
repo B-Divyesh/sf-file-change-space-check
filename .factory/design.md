@@ -76,3 +76,8 @@ are simple project-original geometric marks; no third-party icon library is used
   no people, logos, interface, gradients, text, letters, numbers, or watermark.”
 - License/provenance: generated specifically for this product through the Param
   Factory image deployment; no third-party source image was used.
+
+The same original image was cropped locally with ImageMagick to a 1200×630
+social card at `site/public/assets/social-card.jpg`. The 180×180 Apple touch
+icon is a hand-drawn raster version of the repository's original geometric
+mark. Neither derivative contains third-party material.
