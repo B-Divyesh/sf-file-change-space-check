@@ -27,7 +27,8 @@ enum SparseArg {
     name = "fcsc",
     version,
     about = "Preflight disk space and conflicts without touching your files",
-    long_about = "Scan source and destination metadata, apply an explicit conflict policy, and emit a deterministic copy manifest. Planning never copies, deletes, renames, or changes permissions in the source or destination."
+    long_about = "Scan source and destination metadata, apply an explicit conflict policy, and emit a path-sorted copy manifest. Planning never copies, deletes, renames, or changes permissions in the source or destination.",
+    override_usage = "fcsc <SOURCE> <DESTINATION> --policy <POLICY> [OPTIONS]\n       fcsc --demo [--policy <POLICY>] [--json]"
 )]
 struct Cli {
     /// Run a bundled sample in a new temporary directory
