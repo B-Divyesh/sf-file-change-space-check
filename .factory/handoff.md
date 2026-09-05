@@ -5,7 +5,7 @@
 The strict-review findings are repaired and the product is ready for another
 independent review.
 
-- Implementation and deployment SHA: `e57e9d816281791e2869f98b0e2c2e7e525e6911`
+- Implementation and deployment SHA: `a78cad718840554b319e2acc1c243d086a080e42`
 - Prior failing review SHA: `5dd443f4ec863fc0bd4b3c1c5af7e253a711da18`
 - Live URL: <https://file-change-space-check.sociobot.in/>
 - Demo URL: <https://file-change-space-check.sociobot.in/demo>
@@ -70,7 +70,7 @@ cargo package
 npm audit --omit=dev
 ```
 
-`npm test` passed 8 Rust unit tests, 6 CLI integration tests, 1 doctest, 7
+`npm test` passed 8 Rust unit tests, 7 CLI integration tests, 1 doctest, 7
 browser/site tests, and 17 aggregate claim tests. TypeScript passed strict
 checking. Axe checked five routes at 390×844 in light and dark modes: 10 page
 runs, zero violations. The package contains the CLI sources, CLI tests, docs,
@@ -106,7 +106,7 @@ read or changed.
 - `robots.txt` and `sitemap.xml` return 200. GitHub repository and issue links
   return 200.
 - The live Linux download byte-matches the local release at SHA-256
-  `d0f4c4bd5abb3fe3f2806b57f7c0703f574ff14d7eed573f3a10713b8450f068`.
+  `2baa828d15ca9d61251ef86cd83046d2315dc91bd5623523a70d24d12699d6da`.
   It reports `fcsc 0.1.0` and its demo passes.
 - CSP, HSTS, `no-referrer`, `nosniff`, and restrictive permissions headers are
   live.
