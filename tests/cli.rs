@@ -130,12 +130,20 @@ fn demo_runs_in_a_new_temporary_sandbox() {
 #[test]
 fn demo_json_is_machine_readable_and_uses_requested_policy() {
     let output = Command::new(binary())
-        .args(["--demo", "--policy", "keep-both", "--json"])
+        .args([
+            "--demo",
+            "--policy",
+            "keep-both",
+            "--sparse",
+            "expand",
+            "--json",
+        ])
         .output()
         .unwrap();
     assert!(output.status.success());
     let value: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
     assert_eq!(value["policy"], "keep-both");
+    assert_eq!(value["sparse"], "expand");
     assert_eq!(value["verdict"], "unchecked");
     assert!(value["summary"]["conflicts"].as_u64().unwrap() >= 1);
     let sandbox = PathBuf::from(value["source"].as_str().unwrap())
@@ -143,4 +151,16 @@ fn demo_json_is_machine_readable_and_uses_requested_policy() {
         .unwrap()
         .to_path_buf();
     fs::remove_dir_all(sandbox).unwrap();
+}
+
+#[test]
+fn demo_rejects_a_redundant_no_space_check_flag() {
+    let output = Command::new(binary())
+        .args(["--demo", "--no-space-check"])
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(1));
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(stderr.contains("--demo"));
+    assert!(stderr.contains("--no-space-check"));
 }

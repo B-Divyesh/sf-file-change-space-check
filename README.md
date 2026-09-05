@@ -16,7 +16,8 @@ fcsc --demo
 ```
 
 The command creates a media-archive sample in a new temporary directory. It
-prints the sandbox and manifest paths. Run it again to reset the sample.
+prints the sandbox and manifest paths. Run it again to reset the sample. The
+demo also accepts `--policy`, `--sparse`, and `--json`.
 
 The browser version is at
 [file-change-space-check.sociobot.in/demo/](https://file-change-space-check.sociobot.in/demo/).

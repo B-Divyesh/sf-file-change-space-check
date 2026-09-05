@@ -28,7 +28,7 @@ enum SparseArg {
     version,
     about = "Preflight disk space and conflicts without touching your files",
     long_about = "Scan source and destination metadata, apply an explicit conflict policy, and emit a path-sorted copy manifest. Planning never copies, deletes, renames, or changes permissions in the source or destination.",
-    override_usage = "fcsc <SOURCE> <DESTINATION> --policy <POLICY> [OPTIONS]\n       fcsc --demo [--policy <POLICY>] [--json]"
+    override_usage = "fcsc <SOURCE> <DESTINATION> --policy <POLICY> [OPTIONS]\n       fcsc --demo [--policy <POLICY>] [--sparse <SPARSE>] [--json]"
 )]
 struct Cli {
     /// Run a bundled sample in a new temporary directory
@@ -53,7 +53,7 @@ struct Cli {
     #[arg(long, value_name = "FILE")]
     manifest: Option<PathBuf>,
     /// Plan without checking destination free space (exit 3)
-    #[arg(long)]
+    #[arg(long, conflicts_with = "demo")]
     no_space_check: bool,
 }
 
@@ -74,7 +74,11 @@ fn main() -> ExitCode {
             eprintln!("fcsc: --demo uses its own temporary source, destination, and manifest path");
             return ExitCode::from(1);
         }
-        return run_demo(cli.policy.unwrap_or(PolicyArg::Overwrite), cli.json);
+        return run_demo(
+            cli.policy.unwrap_or(PolicyArg::Overwrite),
+            cli.sparse,
+            cli.json,
+        );
     }
 
     let (source, destination, policy) = match (cli.source, cli.destination, cli.policy) {
@@ -140,7 +144,7 @@ fn main() -> ExitCode {
     }
 }
 
-fn run_demo(policy: PolicyArg, json_only: bool) -> ExitCode {
+fn run_demo(policy: PolicyArg, sparse: SparseArg, json_only: bool) -> ExitCode {
     let root = match create_demo_fixture() {
         Ok(root) => root,
         Err(error) => {
@@ -156,7 +160,11 @@ fn run_demo(policy: PolicyArg, json_only: bool) -> ExitCode {
             PolicyArg::Skip => ConflictPolicy::Skip,
             PolicyArg::KeepBoth => ConflictPolicy::KeepBoth,
         },
-        sparse: SparseMode::Auto,
+        sparse: match sparse {
+            SparseArg::Auto => SparseMode::Auto,
+            SparseArg::Preserve => SparseMode::Preserve,
+            SparseArg::Expand => SparseMode::Expand,
+        },
         check_space: false,
     };
     let manifest = match plan(&options) {

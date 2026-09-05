@@ -14,9 +14,9 @@ runs the real planner, and writes `demo-manifest.json` inside that directory.
 It prints both paths. It does not read or write the caller's file trees.
 
 Use `--policy overwrite`, `--policy skip`, or `--policy keep-both` to change the
-sample conflict result. Add `--json` for machine-readable output. Run the
-command again to reset into a new sandbox. Remove a printed sandbox when it is
-no longer needed.
+sample conflict result. `--sparse` changes its allocation assumption. Add
+`--json` for machine-readable output. Run the command again to reset into a new
+sandbox. Remove a printed sandbox when it is no longer needed.
 
 The sample shape is also documented under `examples/demo/`. It contains a
 media archive, a sparse disk image, and an existing `photos.raw` conflict.
