@@ -206,7 +206,7 @@ test("@claim:cli-local-only the CLI completes without opening a network socket",
   const root = await mkdtemp(join(tmpdir(), "fcsc-network-"));
   try {
     const guard = join(root, "network-guard.so");
-    const compile = spawnSync("rustc", [join(paths.repository, "tests/network_guard.rs"), "--edition=2024", "--crate-type", "cdylib", "-O", "-o", guard], { encoding: "utf8" });
+    const compile = spawnSync("rustc", [join(paths.repository, "tests/fixtures/network_guard.rs"), "--edition=2024", "--crate-type", "cdylib", "-O", "-o", guard], { encoding: "utf8" });
     assert.equal(compile.status, 0, compile.stderr);
     const marker = join(root, "socket-attempted");
     const result = runCli(["--demo", "--json"], { env: { ...process.env, LD_PRELOAD: guard, FCSC_NETWORK_ATTEMPT_LOG: marker } });
