@@ -6,10 +6,16 @@ Strict review 2 is resolved. The product is a free, read-only CLI for people
 who need to estimate free space and conflicts before copying a large local
 folder. The first action on the site is **Try it with sample data**.
 
+Independent verification 5 passed on 2026-09-05 with zero findings and zero
+untested claims. Its full report is in `.factory/verification-5.md`.
+
 - Implementation and deployed SHA: `09a5ebda40e50b4645f26da80e3a62d73cd20570`
 - Earlier review/documentation SHA: `0e652897c3218ce215a2436b66999c0448b815f4`
 - This handoff is a later documentation-only commit and does not change the
   deployed image.
+- Independent verification 5 reviewed documentation SHA
+  `172eb9ce12c43bc2486ab091f4306021a5d12bdf` against that deployed
+  implementation.
 - Live site: <https://file-change-space-check.sociobot.in/>
 - Browser sample: <https://file-change-space-check.sociobot.in/demo/>
 
@@ -42,6 +48,15 @@ folder. The first action on the site is **Try it with sample data**.
 | Symlink containment, invalid exit code, dark contrast, demo, privacy, offline, metadata, discovery, and 404 findings from earlier reviews | Remain fixed; current clean and live checks passed. |
 
 ## Verification
+
+Independent verification 5 repeated the full clean-clone and live checks. It
+installed the packaged crate into a new consumer prefix, ran every one of the
+18 claim commands separately, exercised normal, invalid, boundary, recovery,
+and symlink-containment paths, and found no defect. Fresh live phone and desktop
+contexts also passed demo/reset/isolation, route, keyboard, offline/update,
+privacy, link, header, 404, and parity checks. Ten live Axe scans found zero
+violations. Lighthouse scored 100 for performance, accessibility, best
+practices, and SEO, with FCP 1.0 s, LCP 1.7 s, TBT 30 ms, and CLS 0.
 
 A fresh remote clone at the implementation SHA ran after `npm ci` and the
 documented Rust 1.85 toolchain installation:
