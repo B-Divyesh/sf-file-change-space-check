@@ -15,6 +15,22 @@ The final handoff and QA records are report-only changes after the deployed
 implementation. Their documentation SHA is the commit containing this file;
 the live site and binary remain the implementation SHA above.
 
+## Independent verification 4
+
+Verification 4 reviewed implementation `a78cad718840554b319e2acc1c243d086a080e42`
+and documentation `3f0dfd58c9b4af63082cab377fcd2ab8df0ca332` from a new remote
+clone. It is **PASS** with zero findings and zero untested claims. The full
+record is [`.factory/verification-4.md`](verification-4.md).
+
+The verifier independently ran every documented quality command, all 17
+declared claim commands separately, a packaged-crate consumer install, fresh
+desktop and phone live flows, live privacy/offline/accessibility/route checks,
+and live binary parity. The local release and hosted Linux binary matched at
+SHA-256 `2baa828d15ca9d61251ef86cd83046d2315dc91bd5623523a70d24d12699d6da`.
+Fresh mobile Lighthouse recorded Performance 100, Accessibility 100, and Best
+Practices 100. Its Chromium process logged the known tab-shutdown symptom only
+after producing the complete report; no product page console errors occurred.
+
 ## What changed
 
 1. `fcsc --demo` creates a bundled media-archive sample under a new temporary
