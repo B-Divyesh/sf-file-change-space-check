@@ -1,99 +1,52 @@
 # Handoff — File Change Space Check v0.1.0
 
-## Strict review 2 outcome
+## Outcome
 
-The fresh strict review is **FAIL** with 4 findings and 2 untested public
-claims. The full record is [`.factory/review-2.md`](review-2.md). No product
-code was changed during review.
+Strict review 2 is resolved. The product is a free, read-only CLI for people
+who need to estimate free space and conflicts before copying a large local
+folder. The first action on the site is **Try it with sample data**.
 
-- Implementation and deployment SHA: `a78cad718840554b319e2acc1c243d086a080e42`
-- Prior failing review SHA: `5dd443f4ec863fc0bd4b3c1c5af7e253a711da18`
-- Live URL: <https://file-change-space-check.sociobot.in/>
-- Demo URL: <https://file-change-space-check.sociobot.in/demo>
-- Artifact: Rust CLI plus static Vite documentation site
+- Implementation and deployed SHA: `09a5ebda40e50b4645f26da80e3a62d73cd20570`
+- Earlier review/documentation SHA: `0e652897c3218ce215a2436b66999c0448b815f4`
+- This handoff is a later documentation-only commit and does not change the
+  deployed image.
+- Live site: <https://file-change-space-check.sociobot.in/>
+- Browser sample: <https://file-change-space-check.sociobot.in/demo/>
 
-The final handoff and QA records are report-only changes after the deployed
-implementation. Their documentation SHA is the commit containing this file;
-the live site and binary remain the implementation SHA above.
+## Repairs made
 
-Review 2 confirmed that the clean default-toolchain gates, all 17 declared
-claim commands, installed CLI behavior, live sample, offline path, privacy,
-routes, binary parity, and Lighthouse checks pass. It also found:
+1. Rust 1.85 source installs now work. The incompatible let-chain was replaced
+   with stable nested conditionals. The source-install claim performs a real
+   fresh consumer install with exactly Rust 1.85.0 and executes `fcsc --version`.
+2. The documented Node floor is now Node.js 20.19+ in the README,
+   `package.json`, and lockfile. A new claim runs the complete site build with
+   exactly Node 20.19.0 and checks its static output.
+3. Phone headers retain the three direct route links on every route. Header and
+   footer route links are now at least 44×44 CSS px on both 390 px phone and
+   1440 px desktop layouts.
+4. The regression browser test covers header/footer visibility, target sizes,
+   all main routes, the designed 404, and horizontal overflow. It observes
+   rendered dimensions instead of asserting CSS source text.
+5. The claims registry has 18 independently runnable outcome checks. The two
+   version-boundary public statements are now covered.
 
-1. Rust 1.85 is advertised but cannot compile `src/main.rs`; Rust 1.88 passes.
-2. Node 20+ is advertised, but Node 20.0 cannot run the site build; Node 20.19
-   passes and matches locked Vite's engine requirement.
-3. The 390 px header hides all navigation without a replacement menu.
-4. Phone footer navigation targets are only 15 px high, below the 44 px
-   product requirement.
+## Earlier finding disposition
 
-The Rust and Node boundary statements are not validly covered by the claims
-registry, giving an untested-claim count of 2. Product work should correct the
-two minimums and their boundary tests, restore phone header navigation, and
-enlarge footer hit areas before another verification.
-
-## Independent verification 4
-
-Verification 4 reviewed implementation `a78cad718840554b319e2acc1c243d086a080e42`
-and documentation `3f0dfd58c9b4af63082cab377fcd2ab8df0ca332` from a new remote
-clone. It is **PASS** with zero findings and zero untested claims. The full
-record is [`.factory/verification-4.md`](verification-4.md).
-
-The verifier independently ran every documented quality command, all 17
-declared claim commands separately, a packaged-crate consumer install, fresh
-desktop and phone live flows, live privacy/offline/accessibility/route checks,
-and live binary parity. The local release and hosted Linux binary matched at
-SHA-256 `2baa828d15ca9d61251ef86cd83046d2315dc91bd5623523a70d24d12699d6da`.
-Fresh mobile Lighthouse recorded Performance 100, Accessibility 100, and Best
-Practices 100. Its Chromium process logged the known tab-shutdown symptom only
-after producing the complete report; no product page console errors occurred.
-
-## What changed
-
-1. `fcsc --demo` creates a bundled media-archive sample under a new temporary
-   directory. It runs the real planner, writes a JSON manifest inside that
-   sandbox, and prints both paths. Policy and JSON modes work in the sandbox.
-2. `/demo` and `/demo/` open a populated policy simulator. Its persistent
-   banner says `Demo — sample data, nothing is saved` and provides **Reset
-   demo** and **Start for real**. Browser demo state stays in memory.
-3. The landing page names the job and audience before scrolling. Its first
-   action is **Try it with sample data**. Slogan headings were replaced with
-   plain task language.
-4. The failing crates.io command was removed. The page and README document a
-   tested GitHub checkout plus `cargo install --path . --locked`, and the site
-   still serves the tested Linux binary.
-5. `.factory/claims.json` registers 17 public claims. Every entry has one
-   outcome test tagged `@claim:<id>` and a command that passes independently.
-6. Real `/demo`, `/privacy`, `/terms`, `robots.txt`, `sitemap.xml`, and designed
-   HTTP 404 responses are deployed. Each page has its own title, one `h1`,
-   canonical URL, social metadata, icon, header, footer, and return path.
-7. The project supplies `scripts/verify-url.sh`, TypeScript checking,
-   behavioral route tests, a copy audit, demo documentation, and a verb-first
-   catalog description.
-
-## Review 1 finding disposition
-
-| Finding | Disposition |
+| Finding | Current disposition |
 | --- | --- |
-| P1-1: no CLI/browser demo sandbox | Fixed. CLI and browser demo paths use isolated sample data and have reset/start guidance. |
-| P1-2: false registry install | Fixed. The unavailable registry command is explicitly rejected in README; source and download paths pass. |
-| P1-3: claims absent | Fixed. All 17 declared commands pass separately from a clean checkout. |
-| P1-4: demo, discovery, and 404 routes broken | Fixed live. `/demo`, robots, and sitemap return 200; unknown routes return the designed page with HTTP 404. |
-| P2-1: first-screen and slogan copy | Fixed. Job, audience, first action, three facts, and copy audit now meet the plain-words contract. |
-| P2-2: metadata missing | Fixed on all routes, with a 1200×630 derived social image and 180×180 touch icon. |
-| P2-3: URL verifier missing | Fixed. `scripts/verify-url.sh URL DIR` records desktop/phone screenshots and structural results. |
+| Rust 1.85 cannot compile | Fixed; `cargo +1.85.0 test --locked --all-targets`, doctests, and a clean consumer `cargo +1.85.0 install` pass. |
+| Node 20.0 advertised too broadly | Fixed honestly by publishing the Vite-compatible Node 20.19+ floor and testing the exact boundary. |
+| Phone header removes navigation | Fixed; direct links remain visible and keyboard reachable at 390 px on home, demo, privacy, terms, and 404. |
+| Phone footer targets are 15 px high | Fixed; all route links measure at least 44×44 px. Desktop header links were also enlarged to meet the shared target standard. |
+| Untested Rust and Node public claims | Fixed; the Rust boundary is included in `source-install`, and `node-build-minimum` is a new declared claim. |
+| Symlink containment, invalid exit code, dark contrast, demo, privacy, offline, metadata, discovery, and 404 findings from earlier reviews | Remain fixed; current clean and live checks passed. |
 
-All earlier findings remain fixed: destination symlink containment, invalid
-input exit code, dark-mode contrast, clean-checkout Axe output, TLS, and live
-deployment parity were retested.
+## Verification
 
-## Clean-checkout verification
-
-A fresh remote clone at the implementation SHA used the documented setup. All
-commands passed:
+A fresh remote clone at the implementation SHA ran after `npm ci` and the
+documented Rust 1.85 toolchain installation:
 
 ```sh
-npm ci
 npm test
 npm run build
 PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers npm run audit:a11y
@@ -103,78 +56,75 @@ cargo package
 npm audit --omit=dev
 ```
 
-`npm test` passed 8 Rust unit tests, 7 CLI integration tests, 1 doctest, 7
-browser/site tests, and 17 aggregate claim tests. TypeScript passed strict
-checking. Axe checked five routes at 390×844 in light and dark modes: 10 page
-runs, zero violations. The package contains the CLI sources, CLI tests, docs,
-license, and bundled example files.
+All commands passed. `npm test` passed 8 Rust library tests, 7 CLI integration
+tests, 1 doctest, 8 browser/site tests, and all 18 aggregate claim tests.
+The accessibility audit scanned home, demo, privacy, terms, and the designed
+404 in light and dark mode (10 scans, zero violations). `cargo package`
+verified the crate. The production asset sizes are 4.10 kB JS, 18.75 kB CSS,
+and 172,482 bytes for the original hero image.
 
-Every `test` value in `.factory/claims.json` was then run separately from that
-clean checkout. All 17 commands passed. Coverage includes normal, invalid,
-insufficient, unchecked, sparse, policy, deterministic, offline, privacy,
-keyboard, reset, and recovery paths.
+Every one of the 18 `test` commands in `.factory/claims.json` was then run
+separately from that same clean checkout. All passed. This includes exact Rust
+1.85 source installation, exact Node 20.19 static build, the CLI and browser
+demos, sparse boundaries, invalid/recovery paths, privacy, offline reload,
+and Linux binary parity.
 
-A separate clean consumer installed the packaged crate and ran `fcsc 0.1.0`.
-Its `fcsc --demo --policy keep-both --json` returned one conflict and six
-actions. A fresh GitHub clone also completed the exact documented source
-installation flow.
+A separately packaged crate was installed into a new consumer root. Its
+installed `fcsc --demo --policy keep-both --json` emitted schema 1, one
+conflict, six actions, and `photos (copy 1).raw`.
 
 ## Live verification
 
-The durable static deployment completed successfully on the existing
-`sf-file-change-space-check` resource. No other service or infrastructure was
-read or changed.
+The static deployment completed on the existing `sf-file-change-space-check`
+resource without changing its durable configuration.
 
-- Fresh 1440×1000 and 390×844 browsers showed the job, audience, and sample
-  action before scrolling, with no horizontal overflow or console errors.
-- `/demo` loaded directly with six realistic actions. Keep-both output,
-  22 MiB recovery, reset, the persistent banner, and **Start for real** passed.
-- Browser storage stayed empty. All observed requests were same-origin and no
-  cookies were set.
-- A dedicated context reloaded `/demo/` offline with the correct title and six
-  actions after service-worker control.
-- Live Axe checked five routes in both themes with zero violations.
-- Privacy and terms return 200 with route-specific titles. Unknown paths return
-  HTTP 404 with `Page not found — File Change Space Check`.
-- `robots.txt` and `sitemap.xml` return 200. GitHub repository and issue links
-  return 200.
-- The live Linux download byte-matches the local release at SHA-256
+- The live home, service worker, and Linux artifact byte-match the final build.
+  SHA-256 values are respectively
+  `cfa9bc18d3f8c84a5437a99a065805aefcb0a4719d8edd44f4604f32eebc680c`,
+  `8d92bcbb6b3e02731a797a44020849e32c8b7eef59256a50df4c1f6b4760a47f`, and
   `2baa828d15ca9d61251ef86cd83046d2315dc91bd5623523a70d24d12699d6da`.
-  It reports `fcsc 0.1.0` and its demo passes.
-- CSP, HSTS, `no-referrer`, `nosniff`, and restrictive permissions headers are
-  live.
+- Fresh desktop and phone contexts show the job, audience, and **Try it with
+  sample data** before scrolling. They have no console errors or horizontal
+  overflow, and their header/footer route links measure at least 44×44 px.
+- The live sample starts with six realistic actions and its persistent
+  **Demo — sample data, nothing is saved** label. Keyboard keep-both changes
+  the conflict output, `-1` reports an error, `22` recovers to **SAFE TO
+  START**, reset restores the sample, and **Start for real** removes demo mode.
+  Browser storage, cookies, and external requests remain empty/absent.
+- A dedicated controlled context reloaded `/demo/` offline with the right
+  title and six sample actions.
+- Live Axe scanned five routes in light and dark mode at 390×844: 10 scans,
+  zero violations. Home, demo, privacy, terms, robots, and sitemap return 200;
+  unknown paths return the designed HTTP 404. CSP, HSTS, no-referrer, nosniff,
+  and restrictive permissions headers are live.
+- Lighthouse wrote a complete mobile report: Performance 100, Accessibility
+  100, Best Practices 100, SEO 92; FCP 1.1 s, LCP 1.7 s, CLS 0, TBT 50 ms.
+  The Lighthouse runner reported a Chromium tab-shutdown symptom after it had
+  written the complete report. Independent live page contexts had no console
+  or page errors.
 
-Live Lighthouse wrote a complete report: Performance 100, Accessibility 100,
-Best Practices 100, SEO 92; FCP 0.9 s, LCP 1.7 s, CLS 0, TBT 0 ms. Chromium
-reported its known tab-shutdown crash after writing the report. SEO lost eight
-points because that interrupted run said it could not download `robots.txt`;
-direct cold requests returned the valid file with HTTP 200.
-
-Production assets are 4,098 bytes JavaScript, 18,278 bytes CSS, and 172,482
-bytes for the hero image. They remain inside all declared budgets.
-
-## Run and deploy
+## Run, verify, and deploy
 
 ```sh
+rustup toolchain install 1.85.0 --profile minimal
 npm ci
 npm test
 npm run build
 PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers npm run audit:a11y
-scripts/verify-url.sh http://127.0.0.1:4173/ .factory/evidence/url
-```
-
-`npm run build` writes `dist/downloads/fcsc` and `dist/site/`. Deployment uses:
-
-```sh
+scripts/verify-url.sh https://file-change-space-check.sociobot.in/ .factory/evidence/url
 /opt/fleet/lib/deploy-static.sh file-change-space-check /work/repo/dist/site
 ```
+
+The catalog description is a verb-first 68-byte line in
+`.factory/catalog-description.txt` and was copied to
+`/work/.evidence/catalog-description.txt`.
 
 ## Remaining limits
 
 - The crate is not published on crates.io. The documented source install and
-  hosted Linux download work; registry publication remains an owner action.
-- Windows is not implemented. The planner uses Unix allocation metadata.
+  tested Linux x86-64 download work; registry publication is an owner action.
+- Windows support is not implemented. The allocation checks use Unix metadata.
 - Hard links, reflinks, compression, quotas, and reserved filesystem space are
-  filesystem-specific and are not modeled.
-- Demo CLI sandboxes remain in the operating system's temporary directory for
-  inspection. Their printed paths can be removed after use.
+  filesystem-specific and intentionally not modeled.
+- The product is free, so there is no billing offer or billing-registration
+  dependency.
