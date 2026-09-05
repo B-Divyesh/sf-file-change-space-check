@@ -189,10 +189,10 @@ test("@claim:exit-codes exit codes distinguish safe, invalid, insufficient, and 
   }
 });
 
-test("@claim:source-install a clean consumer prefix installs and runs fcsc", async () => {
+test("@claim:source-install Rust 1.85 installs and runs fcsc from a clean consumer prefix", async () => {
   const root = await mkdtemp(join(tmpdir(), "fcsc-consumer-"));
   try {
-    const install = spawnSync("cargo", ["install", "--path", paths.repository, "--root", root, "--locked"], { encoding: "utf8" });
+    const install = spawnSync("cargo", ["+1.85.0", "install", "--path", paths.repository, "--root", root, "--locked"], { encoding: "utf8" });
     assert.equal(install.status, 0, `${install.stdout}\n${install.stderr}`);
     const version = spawnSync(join(root, "bin/fcsc"), ["--version"], { encoding: "utf8" });
     assert.equal(version.status, 0, version.stderr);
@@ -200,6 +200,17 @@ test("@claim:source-install a clean consumer prefix installs and runs fcsc", asy
   } finally {
     await rm(root, { recursive: true });
   }
+});
+
+test("@claim:node-build-minimum Node 20.19 produces the static site", async () => {
+  const npx = process.platform === "win32" ? "npx.cmd" : "npx";
+  const build = spawnSync(npx, ["--yes", "--package=node@20.19.0", "node", "scripts/build-site.mjs"], {
+    cwd: paths.repository,
+    encoding: "utf8",
+  });
+  assert.equal(build.status, 0, `${build.stdout}\n${build.stderr}`);
+  assert.equal(await stat(join(paths.root, "index.html")).then((item) => item.isFile()), true);
+  assert.equal(await stat(join(paths.root, "sw.js")).then((item) => item.isFile()), true);
 });
 
 test("@claim:cli-local-only the CLI completes without opening a network socket", async () => {

@@ -64,10 +64,17 @@
   },
   {
     "id": "source-install",
-    "claim": "cargo install --path . --locked installs fcsc from a source checkout.",
+    "claim": "Rust 1.85 can install fcsc from a source checkout with cargo install --path . --locked.",
     "where": "landing install section, README",
     "test": "npm run claim -- @claim:source-install",
-    "sandbox": "fresh Cargo consumer root; install and execute fcsc --version"
+    "sandbox": "Rust 1.85; fresh Cargo consumer root; install and execute fcsc --version"
+  },
+  {
+    "id": "node-build-minimum",
+    "claim": "The site build runs on Node.js 20.19 or newer.",
+    "where": "README development requirements",
+    "test": "npm run claim -- @claim:node-build-minimum",
+    "sandbox": "clean checkout dependencies; run the production site build with Node.js 20.19.0 and assert its static output"
   },
   {
     "id": "cli-local-only",

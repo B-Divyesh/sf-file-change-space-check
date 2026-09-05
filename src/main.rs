@@ -124,11 +124,11 @@ fn main() -> ExitCode {
         }
     };
 
-    if let Some(path) = cli.manifest
-        && let Err(error) = fs::write(&path, &json)
-    {
-        eprintln!("fcsc: could not write manifest {}: {error}", path.display());
-        return ExitCode::from(1);
+    if let Some(path) = cli.manifest {
+        if let Err(error) = fs::write(&path, &json) {
+            eprintln!("fcsc: could not write manifest {}: {error}", path.display());
+            return ExitCode::from(1);
+        }
     }
 
     if cli.json {

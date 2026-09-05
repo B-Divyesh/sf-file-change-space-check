@@ -169,7 +169,8 @@ legend { margin-bottom: 18px; font: 800 15px/1.4 var(--mono); }
 footer { display: grid; grid-template-columns: auto 1fr auto; gap: 36px; align-items: center; min-height: 150px; border-top: 3px solid var(--ink); }
 footer p { color: var(--muted); }
 footer p span { display: block; margin-top: 5px; font: 700 12px var(--mono); }
-footer nav { display: flex; gap: 20px; font: 700 13px var(--mono); }
+footer nav { display: flex; flex-wrap: wrap; gap: 12px; font: 700 13px var(--mono); }
+footer nav a { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; padding: 0 6px; }
 
 .legal-page main { max-width: 760px; min-height: calc(100vh - 238px); padding: 72px 0 96px; }
 .legal-page h1 { font-size: clamp(42px, 7vw, 68px); }
@@ -199,7 +200,9 @@ footer nav { display: flex; gap: 20px; font: 700 13px var(--mono); }
 @keyframes terminal-line { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
 @media (max-width: 900px) {
-  .site-header nav { display: none; }
+  .site-header { flex-wrap: wrap; gap: 12px 20px; padding: 12px 0; }
+  .site-header nav { display: flex; order: 3; flex-basis: 100%; justify-content: space-between; gap: 8px; }
+  .site-header nav a { display: inline-flex; flex: 1 1 auto; min-height: 44px; align-items: center; justify-content: center; padding: 0 8px; }
   .hero { grid-template-columns: 1fr; min-height: auto; padding-top: 60px; }
   .hero-art { max-width: 720px; }
   .section-intro { display: block; }

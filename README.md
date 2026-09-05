@@ -104,8 +104,13 @@ Its service worker caches public pages and the fixed demo for offline use.
 
 ## Develop and verify
 
-Requirements are Rust 1.85+, Node.js 20+, npm 10+, and Chromium for browser
-checks. Playwright 1.58.2 is pinned in `package-lock.json`.
+Requirements are Rust 1.85+, Node.js 20.19+, npm 10+, and Chromium for browser
+checks. Playwright 1.58.2 is pinned in `package-lock.json`. The verification
+suite checks the Rust 1.85 boundary, so install it first when using rustup:
+
+```sh
+rustup toolchain install 1.85.0 --profile minimal
+```
 
 ```sh
 npm ci
