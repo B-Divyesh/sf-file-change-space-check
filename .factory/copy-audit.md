@@ -18,7 +18,7 @@ letters or numbers. No sentence exceeds 22 words. No banned word appears.
 | 10 | Run `fcsc --demo` to create a fresh sandbox. |
 | 12 | Read file names, sizes, allocated blocks, entry types, and destination free space. |
 | 10 | Choose overwrite, skip, or keep-both for paths that already exist. |
-| 12 | Compare safe headroom with free space, then print a deterministic JSON manifest. |
+| 12 | Compare safe headroom with free space, then print a path-sorted JSON manifest. |
 | 6 | Rust 1.85 or newer is required. |
 | 8 | The direct download is a Linux x86-64 binary. |
 | 11 | No transfer: the JSON manifest does not copy or delete files. |

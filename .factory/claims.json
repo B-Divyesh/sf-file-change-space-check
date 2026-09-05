@@ -36,7 +36,7 @@
   },
   {
     "id": "deterministic-json",
-    "claim": "Unchanged inputs produce byte-identical, sorted JSON plans.",
+    "claim": "With the space check disabled, unchanged inputs produce byte-identical, sorted JSON plans.",
     "where": "landing how-it-works, README",
     "test": "npm run claim -- @claim:deterministic-json",
     "sandbox": "same unsorted fixture planned twice; compare stdout bytes and action order"

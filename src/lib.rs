@@ -896,7 +896,8 @@ mod tests {
         fs::create_dir(fixture.0.join("destination")).unwrap();
         fs::write(fixture.0.join("source/z.txt"), b"z").unwrap();
         fs::write(fixture.0.join("source/a.txt"), b"a").unwrap();
-        let settings = options(&fixture.0, ConflictPolicy::Overwrite);
+        let mut settings = options(&fixture.0, ConflictPolicy::Overwrite);
+        settings.check_space = false;
         let first = serde_json::to_string(&plan(&settings).unwrap()).unwrap();
         let second = serde_json::to_string(&plan(&settings).unwrap()).unwrap();
         assert_eq!(first, second);

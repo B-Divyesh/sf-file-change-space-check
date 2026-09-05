@@ -4,7 +4,7 @@
 is for people moving archives, project trees, media folders, or extracted data.
 
 The CLI scans filesystem metadata and applies an overwrite, skip, or keep-both
-policy. It prints a human result or a deterministic JSON action manifest. It
+policy. It prints a human result or a path-sorted JSON action manifest. It
 never performs the planned copy.
 
 ## Try the bundled sample
@@ -54,7 +54,9 @@ fcsc ./camera-roll /mnt/archive --policy keep-both --manifest plan.json
 ```
 
 The source directory contents map into `DESTINATION`. A single source file maps
-to `DESTINATION/<source filename>`.
+to `DESTINATION/<source filename>`. With `--no-space-check`, unchanged inputs
+produce byte-identical JSON. A checked plan includes the current free-space
+snapshot, which can change between runs.
 
 ```text
 Usage: fcsc [OPTIONS] [SOURCE] [DESTINATION]
