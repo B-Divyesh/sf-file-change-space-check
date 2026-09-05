@@ -1,9 +1,10 @@
 # Handoff — File Change Space Check v0.1.0
 
-## Repair outcome
+## Strict review 2 outcome
 
-The strict-review findings are repaired and the product is ready for another
-independent review.
+The fresh strict review is **FAIL** with 4 findings and 2 untested public
+claims. The full record is [`.factory/review-2.md`](review-2.md). No product
+code was changed during review.
 
 - Implementation and deployment SHA: `a78cad718840554b319e2acc1c243d086a080e42`
 - Prior failing review SHA: `5dd443f4ec863fc0bd4b3c1c5af7e253a711da18`
@@ -14,6 +15,22 @@ independent review.
 The final handoff and QA records are report-only changes after the deployed
 implementation. Their documentation SHA is the commit containing this file;
 the live site and binary remain the implementation SHA above.
+
+Review 2 confirmed that the clean default-toolchain gates, all 17 declared
+claim commands, installed CLI behavior, live sample, offline path, privacy,
+routes, binary parity, and Lighthouse checks pass. It also found:
+
+1. Rust 1.85 is advertised but cannot compile `src/main.rs`; Rust 1.88 passes.
+2. Node 20+ is advertised, but Node 20.0 cannot run the site build; Node 20.19
+   passes and matches locked Vite's engine requirement.
+3. The 390 px header hides all navigation without a replacement menu.
+4. Phone footer navigation targets are only 15 px high, below the 44 px
+   product requirement.
+
+The Rust and Node boundary statements are not validly covered by the claims
+registry, giving an untested-claim count of 2. Product work should correct the
+two minimums and their boundary tests, restore phone header navigation, and
+enlarge footer hit areas before another verification.
 
 ## Independent verification 4
 
