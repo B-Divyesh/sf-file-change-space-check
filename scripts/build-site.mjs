@@ -24,12 +24,17 @@ async function filesBelow(directory) {
   return files.flat();
 }
 
-const precache = (await filesBelow(output))
-  .filter((path) => /\.(?:html|css|js|svg|webp)$/.test(path) && !path.endsWith(`${sep}sw.js`))
+const precacheFiles = (await filesBelow(output))
+  .filter((path) => /\.(?:html|css|js|svg|webp|jpg|png|txt|xml)$/.test(path) && !path.endsWith(`${sep}sw.js`))
   .map((path) => `/${relative(output, path).split(sep).join("/")}`)
   .sort();
+const precache = [...new Set(precacheFiles.flatMap((path) => {
+  if (path === "/index.html") return [path, "/"];
+  if (path.endsWith("/index.html")) return [path, path.slice(0, -"index.html".length)];
+  return [path];
+}))];
 
-const serviceWorker = `const CACHE = "fcsc-shell-v1";
+const serviceWorker = `const CACHE = "fcsc-shell-v2";
 const SHELL = ${JSON.stringify(precache)};
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)));

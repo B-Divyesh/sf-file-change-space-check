@@ -5,7 +5,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { extname, resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "../dist/site");
-const types = { ".css": "text/css", ".html": "text/html", ".js": "text/javascript", ".svg": "image/svg+xml", ".webp": "image/webp" };
+const types = { ".css": "text/css", ".html": "text/html", ".js": "text/javascript", ".jpg": "image/jpeg", ".png": "image/png", ".svg": "image/svg+xml", ".webp": "image/webp" };
 const server = createServer(async (request, response) => {
   const pathname = new URL(request.url ?? "/", "http://localhost").pathname;
   const relative = pathname === "/" ? "index.html" : pathname.endsWith("/") ? `${pathname.slice(1)}index.html` : pathname.slice(1);
@@ -25,7 +25,7 @@ const browser = await chromium.launch();
 const findings = [];
 try {
   for (const colorScheme of ["light", "dark"]) {
-    for (const path of ["/", "/privacy/", "/terms/"]) {
+    for (const path of ["/", "/demo/", "/privacy/", "/terms/", "/404.html"]) {
       const context = await browser.newContext({ colorScheme, viewport: { width: 390, height: 844 } });
       const page = await context.newPage();
       await page.goto(`${origin}${path}`, { waitUntil: "networkidle" });

@@ -9,16 +9,19 @@
       "headers": { "cache-control": "public, max-age=86400" }
     },
     {
+      "route": "/sw.js",
+      "headers": { "cache-control": "no-cache" }
+    },
+    {
       "route": "/*.html",
       "headers": { "cache-control": "no-cache" }
     }
   ],
-  "navigationFallback": {
-    "rewrite": "/index.html",
-    "exclude": ["/assets/*", "/downloads/*", "/privacy/*", "/terms/*"]
+  "responseOverrides": {
+    "404": { "rewrite": "/404.html" }
   },
   "globalHeaders": {
-    "content-security-policy": "default-src 'self'; img-src 'self'; style-src 'self'; script-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'",
+    "content-security-policy": "default-src 'self'; img-src 'self'; style-src 'self'; script-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'",
     "referrer-policy": "no-referrer",
     "x-content-type-options": "nosniff",
     "permissions-policy": "camera=(), microphone=(), geolocation=()"

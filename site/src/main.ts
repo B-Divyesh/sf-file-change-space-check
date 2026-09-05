@@ -3,46 +3,33 @@ import "./style.css";
 type Policy = "overwrite" | "skip" | "keep-both";
 
 const scenario = {
-  alwaysWriteLower: 8.4,
-  alwaysWriteUpper: 15.2,
-  conflictWrite: 6.4,
-  reclaimable: 5.9,
+  alwaysWriteLower: 3.01,
+  alwaysWriteUpper: 19,
+  conflictWrite: 2,
+  reclaimable: 1,
 };
 
-const form = document.querySelector<HTMLFormElement>("#policy-form");
-const freeInput = document.querySelector<HTMLInputElement>("#free-space");
-const error = document.querySelector<HTMLElement>("#free-error");
-const result = document.querySelector<HTMLElement>("#result");
-
-function query<T extends Element>(selector: string): T {
-  const node = document.querySelector<T>(selector);
-  if (!node) throw new Error(`Missing required element: ${selector}`);
-  return node;
+function query<T extends Element>(selector: string): T | null {
+  return document.querySelector<T>(selector);
 }
 
-const els = {
-  available: query<HTMLElement>("#available-value"),
-  headroom: query<HTMLElement>("#headroom-value"),
-  net: query<HTMLElement>("#net-value"),
-  status: query<HTMLElement>("#result-status"),
-  explanation: query<HTMLElement>("#result-explanation"),
-  actions: query<HTMLOListElement>("#action-list"),
-  fill: query<HTMLElement>("#capacity-fill"),
-  marker: query<HTMLElement>("#capacity-marker"),
-};
-
-function gb(value: number): string {
-  return `${value.toFixed(1)} GB`;
+function mib(value: number): string {
+  return `${value.toFixed(1)} MiB`;
 }
 
-function render(): void {
+const form = query<HTMLFormElement>("#policy-form");
+const freeInput = query<HTMLInputElement>("#free-space");
+const error = query<HTMLElement>("#free-error");
+const result = query<HTMLElement>("#result");
+
+function renderPlan(): void {
   if (!form || !freeInput || !error || !result) return;
   const data = new FormData(form);
   const policy = (data.get("policy") ?? "overwrite") as Policy;
   const free = Number(freeInput.value);
   const invalid = !Number.isFinite(free) || free < 0 || free > 9999;
   freeInput.setAttribute("aria-invalid", String(invalid));
-  error.textContent = invalid ? "Enter free space from 0 to 9,999 GB." : "";
+  error.textContent = invalid ? "Enter free space from 0 to 9,999 MiB." : "";
   if (invalid) {
     result.setAttribute("aria-busy", "true");
     return;
@@ -51,73 +38,105 @@ function render(): void {
 
   const writesConflict = policy !== "skip";
   const headroom = scenario.alwaysWriteUpper + (writesConflict ? scenario.conflictWrite : 0);
-  const lower = scenario.alwaysWriteLower + (writesConflict ? scenario.conflictWrite : 0);
   const reclaimed = policy === "overwrite" ? scenario.reclaimable : 0;
   const net = headroom - reclaimed;
   const safe = free >= headroom;
   const difference = Math.abs(free - headroom);
 
-  els.available.textContent = gb(free);
-  els.headroom.textContent = gb(headroom);
-  els.net.textContent = `${net >= 0 ? "+" : "−"}${gb(Math.abs(net))}`;
-  els.status.className = `result-status ${safe ? "is-safe" : "is-danger"}`;
-  els.status.innerHTML = `<span class="status-icon" aria-hidden="true">${safe ? "✓" : "!"}</span><span><small>Preflight result</small><strong>${safe ? "Safe to start" : "Do not start"}</strong></span>`;
+  const available = query<HTMLElement>("#available-value");
+  const headroomValue = query<HTMLElement>("#headroom-value");
+  const netValue = query<HTMLElement>("#net-value");
+  const status = query<HTMLElement>("#result-status");
+  const explanation = query<HTMLElement>("#result-explanation");
+  const actions = query<HTMLOListElement>("#action-list");
+  const fill = query<HTMLElement>("#capacity-fill");
+  const marker = query<HTMLElement>("#capacity-marker");
+  if (!available || !headroomValue || !netValue || !status || !explanation || !actions || !fill || !marker) return;
+
+  available.textContent = mib(free);
+  headroomValue.textContent = mib(headroom);
+  netValue.textContent = `+${mib(net)}`;
+  status.className = `result-status ${safe ? "is-safe" : "is-danger"}`;
+  status.replaceChildren();
+  const icon = document.createElement("span");
+  icon.className = "status-icon";
+  icon.setAttribute("aria-hidden", "true");
+  icon.textContent = safe ? "✓" : "!";
+  const statusCopy = document.createElement("span");
+  const statusLabel = document.createElement("small");
+  statusLabel.textContent = "Preflight result";
+  const statusValue = document.createElement("strong");
+  statusValue.textContent = safe ? "Safe to start" : "Do not start";
+  statusCopy.append(statusLabel, statusValue);
+  status.append(icon, statusCopy);
 
   const policyNote = policy === "overwrite"
-    ? `The overwrite is staged before ${gb(scenario.reclaimable)} can be reclaimed.`
+    ? `The overwrite is staged before ${mib(scenario.reclaimable)} can be reclaimed.`
     : policy === "skip"
-      ? "The conflicting file stays untouched and adds no write cost."
-      : "The conflict gets a new name, so both full files remain.";
-  els.explanation.textContent = `${policyNote} The upper bound ${safe ? "fits with" : "exceeds available space by"} ${gb(difference)} ${safe ? "to spare" : ""}.`;
+      ? "The existing photo stays untouched and adds no write cost."
+      : "The photo gets a new name, so both files remain.";
+  const spaceNote = safe
+    ? `The upper bound fits with ${mib(difference)} to spare.`
+    : `The upper bound exceeds available space by ${mib(difference)}.`;
+  explanation.textContent = `${policyNote} ${spaceNote}`;
 
-  const actionForConflict = policy === "overwrite"
-    ? ["OVERWRITE", "photos.raw", "6.4 GB"]
+  const conflictAction = policy === "overwrite"
+    ? ["OVERWRITE", "photos.raw", "2.0 MiB"]
     : policy === "skip"
       ? ["SKIP", "photos.raw", "0 B"]
-      : ["COPY", "photos (copy 1).raw", "6.4 GB"];
-  const actions = [
-    ["COPY", "archive/video.mov", "7.2 GB"],
-    actionForConflict,
-    ["COPY", "sparse.image", "1.2–8.0 GB"],
+      : ["COPY", "photos (copy 1).raw", "2.0 MiB"];
+  const plan = [
+    ["MKDIR", "archive", "0 B"],
+    ["COPY", "archive/interview.mov", "3.0 MiB"],
+    ["COPY", "archive/project-notes.txt", "4.0 KiB"],
+    ["MKDIR", "disk-images", "0 B"],
+    ["COPY", "disk-images/field-laptop.img", "4 KiB–16 MiB"],
+    conflictAction,
   ];
-  els.actions.replaceChildren(...actions.map(([operation, path, size]) => {
+  actions.replaceChildren(...plan.map(([operation, path, size]) => {
     const item = document.createElement("li");
-    item.innerHTML = `<b>${operation}</b><code>${path}</code><span>${size}</span>`;
+    const operationNode = document.createElement("b");
+    const pathNode = document.createElement("code");
+    const sizeNode = document.createElement("span");
+    operationNode.textContent = operation;
+    pathNode.textContent = path;
+    sizeNode.textContent = size;
+    item.append(operationNode, pathNode, sizeNode);
     return item;
   }));
 
   const scale = Math.max(headroom, free, 1);
-  els.fill.style.width = `${Math.min(100, (headroom / scale) * 100)}%`;
-  els.marker.style.left = `${Math.min(100, (free / scale) * 100)}%`;
+  fill.style.width = `${Math.min(100, (headroom / scale) * 100)}%`;
+  marker.style.left = `${Math.min(100, (free / scale) * 100)}%`;
   result.dataset.verdict = safe ? "safe" : "danger";
 }
 
-form?.addEventListener("input", render);
-render();
+form?.addEventListener("input", renderPlan);
+renderPlan();
 
-document.querySelectorAll<HTMLButtonElement>("[data-copy]").forEach((button) => {
-  button.addEventListener("click", async () => {
-    const target = document.querySelector<HTMLElement>(button.dataset.copy ?? "");
-    if (!target) return;
-    try {
-      await navigator.clipboard.writeText(target.textContent ?? "");
-      button.textContent = "Copied";
-      window.setTimeout(() => { button.textContent = "Copy"; }, 1600);
-    } catch {
-      const selection = window.getSelection();
-      const range = document.createRange();
-      range.selectNodeContents(target);
-      selection?.removeAllRanges();
-      selection?.addRange(range);
-      button.textContent = "Selected";
-    }
-  });
+query<HTMLButtonElement>("#reset-demo")?.addEventListener("click", () => {
+  form?.reset();
+  renderPlan();
+  const message = query<HTMLElement>("#demo-message");
+  if (message) message.textContent = "Demo reset to overwrite with 16 MiB free.";
+  query<HTMLInputElement>('input[name="policy"]:checked')?.focus();
 });
 
-const networkState = document.querySelector<HTMLElement>("#network-state");
+query<HTMLButtonElement>("#replay-recording")?.addEventListener("click", (event) => {
+  const recording = query<HTMLElement>(".terminal-recording");
+  if (!recording) return;
+  recording.classList.remove("is-replaying");
+  void recording.offsetWidth;
+  recording.classList.add("is-replaying");
+  const button = event.currentTarget as HTMLButtonElement;
+  button.textContent = "Playing demo";
+  window.setTimeout(() => { button.textContent = "Replay terminal demo"; }, 2400);
+});
+
+const networkState = query<HTMLElement>("#network-state");
 function renderNetwork(): void {
   if (!networkState) return;
-  networkState.textContent = navigator.onLine ? "● Local-only" : "○ Offline · demo works";
+  networkState.textContent = navigator.onLine ? "● Ready offline" : "○ Offline · sample works";
 }
 window.addEventListener("online", renderNetwork);
 window.addEventListener("offline", renderNetwork);

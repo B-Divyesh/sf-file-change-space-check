@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f5f0e3" />
+    <meta name="description" content="Try File Change Space Check with a fixed media-archive sample. Change the conflict policy and free space without selecting local files." />
+    <title>Demo — File Change Space Check</title>
+    <link rel="canonical" href="https://file-change-space-check.sociobot.in/demo/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Demo — File Change Space Check" />
+    <meta property="og:description" content="Try a free-space and conflict plan with fixed sample data." />
+    <meta property="og:url" content="https://file-change-space-check.sociobot.in/demo/" />
+    <meta property="og:image" content="https://file-change-space-check.sociobot.in/assets/social-card.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Demo — File Change Space Check" />
+    <meta name="twitter:description" content="Try a free-space and conflict plan with fixed sample data." />
+    <meta name="twitter:image" content="https://file-change-space-check.sociobot.in/assets/social-card.jpg" />
+    <link rel="icon" href="/mark.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  </head>
+  <body class="demo-page">
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="File Change Space Check home"><span class="brand-mark" aria-hidden="true">F/</span><span>FILE CHANGE<br />SPACE CHECK</span></a>
+      <nav aria-label="Main navigation"><a href="/demo/" aria-current="page">Demo</a><a href="/#how">How it works</a><a href="/privacy/">Privacy</a></nav>
+      <span class="network-state" id="network-state" aria-live="polite">● Ready offline</span>
+    </header>
+    <aside class="demo-banner" aria-label="Demo status">
+      <strong>Demo — sample data, nothing is saved</strong>
+      <span id="demo-message" aria-live="polite">Change the sample plan below.</span>
+      <div><button id="reset-demo" type="button">Reset demo</button><a href="/#install">Start for real</a></div>
+    </aside>
+
+    <main id="main" class="demo-main">
+      <section class="demo-heading" aria-labelledby="demo-title">
+        <p class="eyebrow">Bundled media archive</p>
+        <h1 id="demo-title" tabindex="-1">Test a copy plan with sample files</h1>
+        <p>Choose a conflict rule or change free space. The result updates without reading your files.</p>
+      </section>
+
+      <section class="demo-section" aria-label="Sample copy planner">
+        <div class="demo-grid">
+          <form class="policy-form" id="policy-form">
+            <fieldset>
+              <legend>When <code>photos.raw</code> already exists</legend>
+              <label class="radio-card"><input type="radio" name="policy" value="overwrite" checked /><span><strong>Overwrite</strong><small>Write the new file before reclaiming the old one.</small></span></label>
+              <label class="radio-card"><input type="radio" name="policy" value="skip" /><span><strong>Skip</strong><small>Keep the destination file and write no conflict bytes.</small></span></label>
+              <label class="radio-card"><input type="radio" name="policy" value="keep-both" /><span><strong>Keep both</strong><small>Write <code>photos (copy 1).raw</code> beside it.</small></span></label>
+            </fieldset>
+            <label class="number-field" for="free-space"><span>Destination free space</span><span class="number-input"><input id="free-space" name="free-space" type="number" inputmode="decimal" min="0" max="9999" step="0.1" value="16" aria-describedby="free-help free-error" /><b>MiB</b></span></label>
+            <small id="free-help">Enter 22 MiB to make the overwrite plan fit.</small>
+            <p class="form-error" id="free-error" role="alert"></p>
+          </form>
+
+          <article class="result-card" id="result" aria-live="polite" aria-atomic="true">
+            <div class="result-status" id="result-status"><span class="status-icon" aria-hidden="true">!</span><span><small>Preflight result</small><strong>Do not start</strong></span></div>
+            <dl class="meter-values">
+              <div><dt>Available</dt><dd id="available-value">16.0 MiB</dd></div>
+              <div><dt>Headroom needed</dt><dd id="headroom-value">21.0 MiB</dd></div>
+              <div><dt>Final net change</dt><dd id="net-value">+20.0 MiB</dd></div>
+            </dl>
+            <div class="capacity-bar" aria-hidden="true"><span id="capacity-fill"></span><i id="capacity-marker"></i></div>
+            <p class="result-explanation" id="result-explanation">The overwrite is staged before 1.0 MiB can be reclaimed. The upper bound exceeds available space by 5.0 MiB.</p>
+            <div class="action-list"><p class="action-heading">Action manifest <span>6 entries</span></p><ol id="action-list"></ol></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="demo-notes" aria-labelledby="sample-title">
+        <h2 id="sample-title">What the sample contains</h2>
+        <p>The source has an interview video, project notes, a sparse disk image, and <code>photos.raw</code>. The destination already has <code>photos.raw</code>.</p>
+        <div class="terminal" aria-label="CLI command for the same sample"><div class="terminal-bar"><span>Run this sample locally</span><span>temporary files</span></div><pre tabindex="0"><code><span class="prompt">$</span> fcsc --demo
+<span class="comment"># prints the sandbox and manifest paths</span></code></pre></div>
+      </section>
+    </main>
+
+    <footer>
+      <a class="brand footer-brand" href="/" aria-label="File Change Space Check home"><span class="brand-mark" aria-hidden="true">F/</span><span>FILE CHANGE<br />SPACE CHECK</span></a>
+      <p>Check space and conflicts before a local file copy. <span>Built by Param Factory · v0.1.0 · build 2026.09.05</span></p>
+      <nav aria-label="Footer navigation"><a href="/">Home</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a></nav>
+    </footer>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

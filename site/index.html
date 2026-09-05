@@ -4,164 +4,120 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#f5f0e3" />
-    <meta name="description" content="Check whether a large local copy will fit, resolve conflicts on paper, and export a deterministic action manifest." />
-    <title>File Change Space Check — Preflight local copies</title>
+    <meta name="description" content="Estimate free space and file conflicts before copying a large local folder. Preview a sample plan, then install the read-only CLI." />
+    <title>File Change Space Check — Plan local file copies</title>
+    <link rel="canonical" href="https://file-change-space-check.sociobot.in/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="File Change Space Check — Plan local file copies" />
+    <meta property="og:description" content="Estimate free space and conflicts before copying a large local folder." />
+    <meta property="og:url" content="https://file-change-space-check.sociobot.in/" />
+    <meta property="og:image" content="https://file-change-space-check.sociobot.in/assets/social-card.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="File Change Space Check — Plan local file copies" />
+    <meta name="twitter:description" content="Estimate free space and conflicts before copying a large local folder." />
+    <meta name="twitter:image" content="https://file-change-space-check.sociobot.in/assets/social-card.jpg" />
     <link rel="icon" href="/mark.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="preload" href="/assets/allocation-ledger.webp" as="image" type="image/webp" fetchpriority="high" />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to main content</a>
     <header class="site-header">
-      <a class="brand" href="/">
-        <span class="brand-mark" aria-hidden="true">F/</span>
-        <span>FILE CHANGE<br />SPACE CHECK</span>
-      </a>
-      <nav aria-label="Main navigation">
-        <a href="#how">How it works</a>
-        <a href="#demo">Try a policy</a>
-        <a href="#limits">Limits</a>
-      </nav>
-      <span class="network-state" id="network-state" aria-live="polite">● Local-only</span>
+      <a class="brand" href="/" aria-label="File Change Space Check home"><span class="brand-mark" aria-hidden="true">F/</span><span>FILE CHANGE<br />SPACE CHECK</span></a>
+      <nav aria-label="Main navigation"><a href="/demo/">Demo</a><a href="#how">How it works</a><a href="/privacy/">Privacy</a></nav>
+      <span class="network-state" id="network-state" aria-live="polite">● Ready offline</span>
     </header>
 
     <main id="main">
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <p class="eyebrow">Read-only filesystem preflight / v0.1.0</p>
-          <h1 id="hero-title">Know the copy fits.<br /><span>Before the first byte moves.</span></h1>
-          <p class="hero-lede">Scan source and destination metadata, settle overwrite conflicts, and budget sparse-file uncertainty before a long file operation can strand your archive.</p>
-          <div class="install-row">
-            <code id="install-command">cargo install file-change-space-check</code>
-            <button class="copy-button" type="button" data-copy="#install-command" aria-label="Copy install command">Copy</button>
-          </div>
+          <p class="eyebrow">Read-only copy preflight / v0.1.0</p>
+          <h1 id="hero-title">Check space before you copy files</h1>
+          <p class="hero-lede">For people moving large folders who need a space and conflict estimate before a long copy starts.</p>
           <div class="hero-actions">
-            <a class="button button-primary" href="/downloads/fcsc-linux-x86_64" download>Download for Linux</a>
-            <a class="text-link" href="#usage">See CLI usage <span aria-hidden="true">↓</span></a>
+            <a class="button button-primary" href="/demo/">Try it with sample data</a>
+            <span class="action-note">See a finished plan in one click.</span>
           </div>
-          <ul class="trust-list" aria-label="Product guarantees">
-            <li><span aria-hidden="true">✓</span> No file changes</li>
-            <li><span aria-hidden="true">✓</span> No telemetry</li>
-            <li><span aria-hidden="true">✓</span> Deterministic JSON</li>
+          <ul class="trust-list" aria-label="Product facts">
+            <li><span aria-hidden="true">✓</span> Reads file metadata, not file contents</li>
+            <li><span aria-hidden="true">✓</span> Changes no source or destination files</li>
+            <li><span aria-hidden="true">✓</span> Free to use, with no telemetry</li>
           </ul>
         </div>
         <figure class="hero-art">
-          <div class="figure-label">Allocation study / 001</div>
-          <img src="/assets/allocation-ledger.webp" width="1536" height="1024" fetchpriority="high" alt="Blue file blocks measured on a grid before entering a disk, while an amber conflict block is diverted aside." />
-          <figcaption>Measure. Resolve. Then move.</figcaption>
+          <div class="figure-label">Source + conflicts + free space</div>
+          <img src="/assets/allocation-ledger.webp" width="1536" height="1024" fetchpriority="high" alt="Blue file blocks are measured before entering a disk while one amber conflict is held aside." />
+          <figcaption>Files are measured before any copy begins.</figcaption>
         </figure>
       </section>
 
       <section class="proof-strip" aria-label="Planning sequence">
-        <p><b>01</b> Scan metadata</p>
-        <span aria-hidden="true">→</span>
-        <p><b>02</b> Apply policy</p>
-        <span aria-hidden="true">→</span>
-        <p><b>03</b> Check headroom</p>
-        <span aria-hidden="true">→</span>
-        <p><b>04</b> Emit manifest</p>
+        <p><b>01</b> Scan metadata</p><span aria-hidden="true">→</span>
+        <p><b>02</b> Apply policy</p><span aria-hidden="true">→</span>
+        <p><b>03</b> Check space</p><span aria-hidden="true">→</span>
+        <p><b>04</b> Write JSON</p>
       </section>
 
-      <section class="demo-section" id="demo" aria-labelledby="demo-title">
+      <section class="recording-section" aria-labelledby="recording-title">
         <div class="section-intro">
-          <p class="eyebrow">Policy simulator</p>
-          <h2 id="demo-title">One tree. Three very different answers.</h2>
-          <p>This browser demo uses a fixed example; your files never enter the page. Change the free space and conflict rule to see the plan recompute.</p>
+          <div><p class="eyebrow">Real CLI sample</p><h2 id="recording-title">See the sample plan before installing</h2></div>
+          <p>The bundled demo creates a temporary media archive. It shows one conflict and a sparse disk image.</p>
         </div>
-
-        <div class="demo-grid">
-          <form class="policy-form" id="policy-form">
-            <fieldset>
-              <legend>When <code>photos.raw</code> already exists</legend>
-              <label class="radio-card">
-                <input type="radio" name="policy" value="overwrite" checked />
-                <span><strong>Overwrite</strong><small>Budget the new file before reclaiming the old one.</small></span>
-              </label>
-              <label class="radio-card">
-                <input type="radio" name="policy" value="skip" />
-                <span><strong>Skip</strong><small>Keep the destination and write no bytes for this conflict.</small></span>
-              </label>
-              <label class="radio-card">
-                <input type="radio" name="policy" value="keep-both" />
-                <span><strong>Keep both</strong><small>Write <code>photos (copy 1).raw</code> beside it.</small></span>
-              </label>
-            </fieldset>
-            <label class="number-field" for="free-space">
-              <span>Destination free space</span>
-              <span class="number-input"><input id="free-space" name="free-space" type="number" inputmode="decimal" min="0" max="9999" step="0.1" value="16" aria-describedby="free-help free-error" /><b>GB</b></span>
-            </label>
-            <small id="free-help">Try 22 GB to turn this plan safe.</small>
-            <p class="form-error" id="free-error" role="alert"></p>
-          </form>
-
-          <article class="result-card" id="result" aria-live="polite" aria-atomic="true">
-            <div class="result-status" id="result-status">
-              <span class="status-icon" aria-hidden="true">!</span>
-              <span><small>Preflight result</small><strong>Do not start</strong></span>
-            </div>
-            <dl class="meter-values">
-              <div><dt>Available</dt><dd id="available-value">16.0 GB</dd></div>
-              <div><dt>Headroom needed</dt><dd id="headroom-value">21.6 GB</dd></div>
-              <div><dt>Final net change</dt><dd id="net-value">+15.7 GB</dd></div>
-            </dl>
-            <div class="capacity-bar" aria-hidden="true"><span id="capacity-fill"></span><i id="capacity-marker"></i></div>
-            <p class="result-explanation" id="result-explanation">The overwrite is staged before 5.9 GB can be reclaimed. The upper bound exceeds available space by 5.6 GB.</p>
-            <div class="action-list">
-              <p class="action-heading">Action manifest <span>3 entries</span></p>
-              <ol id="action-list"></ol>
-            </div>
-          </article>
+        <div class="terminal terminal-recording" aria-label="Recording transcript of fcsc running its bundled demo">
+          <div class="terminal-bar"><span>fcsc --demo</span><button id="replay-recording" type="button">Replay terminal demo</button></div>
+          <pre tabindex="0"><code><span class="terminal-line"><span class="prompt">$</span> fcsc --demo</span>
+<span class="terminal-line">DEMO — sample data in a temporary sandbox</span>
+<span class="terminal-line">Status       SPACE NOT CHECKED</span>
+<span class="terminal-line">Policy       Overwrite</span>
+<span class="terminal-line">Headroom     5.01 MiB .. 21.00 MiB</span>
+<span class="terminal-line">Conflicts    1  |  actions 6</span>
+<span class="terminal-line warning">OVERWRITE  photos.raw</span>
+<span class="terminal-line comment">Read-only plan. No source or destination files were changed.</span></code></pre>
         </div>
+        <p class="recording-note">The recording is a transcript from the packaged binary. Run <code>fcsc --demo</code> to create a fresh sandbox.</p>
       </section>
 
       <section class="how-section" id="how" aria-labelledby="how-title">
-        <div class="section-intro compact">
-          <p class="eyebrow">What the number means</p>
-          <h2 id="how-title">Headroom, not wishful subtraction.</h2>
-        </div>
-        <div class="explain-grid">
-          <article><span class="stamp">A</span><h3>Observe</h3><p>Read sizes, allocated blocks, entry types, and destination availability. Never read file contents by default.</p></article>
-          <article><span class="stamp">B</span><h3>Reconcile</h3><p>Apply overwrite, skip, or keep-both to every relative path in lexical order.</p></article>
-          <article><span class="stamp">C</span><h3>Bound</h3><p>Report sparse files as a lower–upper range. The safer upper bound controls the verdict.</p></article>
-          <article><span class="stamp">D</span><h3>Record</h3><p>Print a human check or portable JSON manifest. It remains a plan, never an executable script.</p></article>
+        <div class="section-intro compact"><p class="eyebrow">How it works</p><h2 id="how-title">Plan one copy in three steps</h2></div>
+        <div class="explain-grid three-columns">
+          <article><span class="stamp">1</span><h3>Scan metadata</h3><p>Read file names, sizes, allocated blocks, entry types, and destination free space.</p></article>
+          <article><span class="stamp">2</span><h3>Apply a conflict policy</h3><p>Choose overwrite, skip, or keep-both for paths that already exist.</p></article>
+          <article><span class="stamp">3</span><h3>Check and export</h3><p>Compare safe headroom with free space, then print a deterministic JSON manifest.</p></article>
         </div>
       </section>
 
-      <section class="usage-section" id="usage" aria-labelledby="usage-title">
-        <div class="usage-copy">
-          <p class="eyebrow">Small surface, useful output</p>
-          <h2 id="usage-title">Put it before <code>cp</code>, not inside it.</h2>
-          <p>The tool plans source directory contents into a destination root. It does not attempt to guess your copy command or permissions.</p>
-          <a class="button button-secondary" href="https://github.com/B-Divyesh/sf-file-change-space-check">Read the source on GitHub</a>
+      <section class="install-section" id="install" aria-labelledby="install-title">
+        <div class="install-copy">
+          <p class="eyebrow">Install</p>
+          <h2 id="install-title">Install the CLI from source</h2>
+          <p>Rust 1.85 or newer is required. The direct download is a Linux x86-64 binary.</p>
+          <div class="hero-actions"><a class="button button-secondary" href="/downloads/fcsc-linux-x86_64" download>Download for Linux</a><a class="text-link" href="https://github.com/B-Divyesh/sf-file-change-space-check">Read the source on GitHub</a></div>
         </div>
-        <div class="terminal" aria-label="Command line example">
-          <div class="terminal-bar"><span>preflight.sh</span><span>read only</span></div>
-          <pre tabindex="0"><code><span class="prompt">$</span> fcsc ./camera-roll /mnt/archive \
-  --policy overwrite --json
-
-<span class="json">"verdict"</span>: <span class="warning">"insufficient"</span>,
-<span class="json">"required_headroom_bytes_upper"</span>: 23192823398,
-<span class="json">"conflicts"</span>: 1
-
-<span class="comment"># exit 2 · no files changed</span></code></pre>
+        <div class="terminal" aria-label="Source installation commands">
+          <div class="terminal-bar"><span>Install from source</span><span>v0.1.0</span></div>
+          <pre tabindex="0"><code><span class="prompt">$</span> git clone https://github.com/B-Divyesh/sf-file-change-space-check.git
+<span class="prompt">$</span> cd sf-file-change-space-check
+<span class="prompt">$</span> cargo install --path . --locked
+<span class="prompt">$</span> fcsc --demo</code></pre>
         </div>
       </section>
 
       <section class="limits-section" id="limits" aria-labelledby="limits-title">
-        <p class="eyebrow">Honest limits</p>
-        <h2 id="limits-title">It plans the terrain. It does not drive.</h2>
+        <p class="eyebrow">Limits and privacy</p>
+        <h2 id="limits-title">Know what the plan does not cover</h2>
         <ul>
-          <li><b>No transfer:</b> the manifest is deliberately non-executable.</li>
+          <li><b>No transfer:</b> the JSON manifest does not copy or delete files.</li>
           <li><b>No permission promise:</b> readable metadata does not prove a later copy can write.</li>
-          <li><b>Sparse range:</b> actual allocation depends on filesystem and copy-tool behavior.</li>
-          <li><b>Unix v1:</b> Linux and macOS are supported; Windows is a known next step.</li>
+          <li><b>Sparse range:</b> allocation depends on the filesystem and the copy tool.</li>
+          <li><b>Local run:</b> the CLI works without accounts or network access.</li>
         </ul>
       </section>
     </main>
 
     <footer>
-      <a class="brand footer-brand" href="/"><span class="brand-mark" aria-hidden="true">F/</span><span>FILE CHANGE<br />SPACE CHECK</span></a>
-      <p>Free, inspectable, and built for the moment before a risky copy.</p>
-      <nav aria-label="Footer navigation"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="https://github.com/B-Divyesh/sf-file-change-space-check">Source</a></nav>
+      <a class="brand footer-brand" href="/" aria-label="File Change Space Check home"><span class="brand-mark" aria-hidden="true">F/</span><span>FILE CHANGE<br />SPACE CHECK</span></a>
+      <p>Check space and conflicts before a local file copy. <span>Built by Param Factory · v0.1.0 · build 2026.09.05</span></p>
+      <nav aria-label="Footer navigation"><a href="/demo/">Demo</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a></nav>
     </footer>
     <script type="module" src="/src/main.ts"></script>
   </body>
