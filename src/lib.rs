@@ -250,6 +250,7 @@ pub fn plan(options: &PlanOptions) -> Result<Manifest, PlanError> {
         let name = source
             .file_name()
             .ok_or_else(|| PlanError::InvalidInput("source must have a file name".into()))?;
+        planner.reserve_destination(&destination.join(name));
         planner.scan_entry(
             &source,
             Path::new(name),
@@ -316,6 +317,7 @@ impl Planner {
                 source,
             })?;
         entries.sort_by_key(|entry| entry.file_name());
+        self.reserve_child_destinations(&entries, destination_dir);
         for entry in entries {
             let name = entry.file_name();
             self.scan_entry(
@@ -424,7 +426,6 @@ impl Planner {
                     }
                     ConflictPolicy::KeepBoth => {
                         let alternate = self.keep_both_path(destination);
-                        self.reserved.insert(alternate.clone());
                         self.push_action(
                             Operation::CreateDirectory,
                             EntryKind::Directory,
@@ -461,6 +462,7 @@ impl Planner {
                 source,
             })?;
         entries.sort_by_key(|entry| entry.file_name());
+        self.reserve_child_destinations(&entries, destination_dir);
         for entry in entries {
             let name = entry.file_name();
             self.scan_entry(
@@ -546,7 +548,6 @@ impl Planner {
                     }
                     ConflictPolicy::KeepBoth => {
                         let alternate = self.keep_both_path(destination);
-                        self.reserved.insert(alternate.clone());
                         self.push_action(
                             Operation::Copy,
                             kind,
@@ -584,6 +585,16 @@ impl Planner {
         unreachable!()
     }
 
+    fn reserve_child_destinations(&mut self, entries: &[fs::DirEntry], destination_dir: &Path) {
+        for entry in entries {
+            self.reserve_destination(&destination_dir.join(entry.file_name()));
+        }
+    }
+
+    fn reserve_destination(&mut self, destination: &Path) {
+        self.reserved.insert(destination.to_path_buf());
+    }
+
     #[allow(clippy::too_many_arguments)]
     fn push_action(
         &mut self,
@@ -596,6 +607,7 @@ impl Planner {
         reclaimable: u64,
         reason: &str,
     ) {
+        self.reserve_destination(destination);
         self.actions.push(Action {
             sequence: self.actions.len() + 1,
             operation,
@@ -935,6 +947,57 @@ mod tests {
                 .destination
                 .ends_with("photo (copy 2).jpg")
         );
+    }
+
+    #[test]
+    fn keep_both_preserves_source_entries_with_generated_alternate_names() {
+        let fixture = Fixture::new();
+        let source = fixture.0.join("source");
+        let destination = fixture.0.join("destination");
+        fs::create_dir(&source).unwrap();
+        fs::create_dir(&destination).unwrap();
+
+        fs::write(source.join("photo.jpg"), b"original photo").unwrap();
+        fs::write(source.join("photo (copy 1).jpg"), b"named copy").unwrap();
+        fs::write(destination.join("photo.jpg"), b"destination photo").unwrap();
+
+        fs::create_dir(source.join("album")).unwrap();
+        fs::write(source.join("album/from-original.txt"), b"original album").unwrap();
+        fs::create_dir(source.join("album (copy 1)")).unwrap();
+        fs::write(source.join("album (copy 1)/named-copy.txt"), b"named album").unwrap();
+        fs::write(destination.join("album"), b"destination file").unwrap();
+
+        let manifest = plan(&options(&fixture.0, ConflictPolicy::KeepBoth)).unwrap();
+        let destinations: HashSet<_> = manifest
+            .actions
+            .iter()
+            .map(|action| action.destination.as_str())
+            .collect();
+        assert_eq!(destinations.len(), manifest.actions.len());
+
+        let photo_destination = |source: &str| {
+            manifest
+                .actions
+                .iter()
+                .find(|action| action.source == source)
+                .expect("each source photo has a planned action")
+                .destination
+                .as_str()
+        };
+        assert!(photo_destination("photo (copy 1).jpg").ends_with("photo (copy 1).jpg"));
+        assert!(photo_destination("photo.jpg").ends_with("photo (copy 2).jpg"));
+
+        let album_destination = |source: &str| {
+            manifest
+                .actions
+                .iter()
+                .find(|action| action.source == source && action.kind == EntryKind::Directory)
+                .expect("each source album has a planned directory action")
+                .destination
+                .as_str()
+        };
+        assert!(album_destination("album (copy 1)").ends_with("album (copy 1)"));
+        assert!(album_destination("album").ends_with("album (copy 2)"));
     }
 
     #[test]

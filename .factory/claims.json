@@ -25,7 +25,7 @@
     "claim": "Overwrite, skip, and keep-both produce policy-specific plans.",
     "where": "landing how-it-works, demo, README",
     "test": "npm run claim -- @claim:conflict-policies",
-    "sandbox": "temporary conflict with an occupied copy suffix; assert overwrite, skip, and next keep-both name"
+    "sandbox": "temporary conflicts with an occupied copy suffix and source file/directory names that match generated suffixes; assert policy actions and unique keep-both destinations"
   },
   {
     "id": "sparse-bounds",

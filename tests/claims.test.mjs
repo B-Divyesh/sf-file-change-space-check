@@ -109,6 +109,7 @@ test("@claim:metadata-only regular file contents are not required", async () => 
 
 test("@claim:conflict-policies overwrite, skip, and keep-both change the plan", async () => {
   const sample = await fixture();
+  let collision;
   try {
     await writeFile(join(sample.source, "photo.raw"), "new photo");
     await writeFile(join(sample.destination, "photo.raw"), "old photo");
@@ -120,8 +121,28 @@ test("@claim:conflict-policies overwrite, skip, and keep-both change the plan", 
     assert.equal(skip.operation, "skip");
     assert.equal(keep.operation, "copy");
     assert.equal(basename(keep.destination), "photo (copy 2).raw");
+
+    collision = await fixture("fcsc-policy-collision-");
+    await writeFile(join(collision.source, "photo.jpg"), "original photo");
+    await writeFile(join(collision.source, "photo (copy 1).jpg"), "named copy");
+    await writeFile(join(collision.destination, "photo.jpg"), "destination photo");
+    await mkdir(join(collision.source, "album"));
+    await writeFile(join(collision.source, "album/from-original.txt"), "original album");
+    await mkdir(join(collision.source, "album (copy 1)"));
+    await writeFile(join(collision.source, "album (copy 1)/named-copy.txt"), "named album");
+    await writeFile(join(collision.destination, "album"), "destination file");
+
+    const collisionPlan = parsedPlan(collision, "keep-both").value;
+    const destinationPaths = collisionPlan.actions.map((action) => action.destination);
+    assert.equal(new Set(destinationPaths).size, destinationPaths.length);
+    const destinationFor = (source) => collisionPlan.actions.find((action) => action.source === source)?.destination;
+    assert.equal(basename(destinationFor("photo (copy 1).jpg")), "photo (copy 1).jpg");
+    assert.equal(basename(destinationFor("photo.jpg")), "photo (copy 2).jpg");
+    assert.equal(basename(destinationFor("album (copy 1)")), "album (copy 1)");
+    assert.equal(basename(destinationFor("album")), "album (copy 2)");
   } finally {
     await rm(sample.root, { recursive: true });
+    if (collision) await rm(collision.root, { recursive: true });
   }
 });
 
