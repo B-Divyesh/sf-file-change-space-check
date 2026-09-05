@@ -99,3 +99,48 @@ fn invalid_policy_uses_the_documented_input_error_exit_code() {
     assert!(String::from_utf8_lossy(&output.stderr).contains("invalid value 'not-a-policy'"));
     assert!(output.stdout.is_empty());
 }
+
+#[test]
+fn demo_runs_in_a_new_temporary_sandbox() {
+    let working = Fixture::new();
+    let before = fs::read_dir(&working.0).unwrap().count();
+    let output = Command::new(binary())
+        .arg("--demo")
+        .current_dir(&working.0)
+        .output()
+        .unwrap();
+    assert!(output.status.success());
+    let stdout = String::from_utf8(output.stdout).unwrap();
+    assert!(stdout.contains("DEMO — sample data in a temporary sandbox"));
+    assert!(stdout.contains("photos.raw"));
+    assert!(stdout.contains("field-laptop.img"));
+    assert!(stdout.contains("demo-manifest.json"));
+    assert_eq!(fs::read_dir(&working.0).unwrap().count(), before);
+
+    let sandbox = stdout
+        .lines()
+        .find_map(|line| line.strip_prefix("Sample sandbox  "))
+        .map(PathBuf::from)
+        .expect("demo prints its sandbox path");
+    assert!(sandbox.starts_with(std::env::temp_dir()));
+    assert!(sandbox.join("demo-manifest.json").is_file());
+    fs::remove_dir_all(sandbox).unwrap();
+}
+
+#[test]
+fn demo_json_is_machine_readable_and_uses_requested_policy() {
+    let output = Command::new(binary())
+        .args(["--demo", "--policy", "keep-both", "--json"])
+        .output()
+        .unwrap();
+    assert!(output.status.success());
+    let value: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(value["policy"], "keep-both");
+    assert_eq!(value["verdict"], "unchecked");
+    assert!(value["summary"]["conflicts"].as_u64().unwrap() >= 1);
+    let sandbox = PathBuf::from(value["source"].as_str().unwrap())
+        .parent()
+        .unwrap()
+        .to_path_buf();
+    fs::remove_dir_all(sandbox).unwrap();
+}

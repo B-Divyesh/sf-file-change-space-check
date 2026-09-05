@@ -13,6 +13,7 @@ readme = "README.md"
 include = [
   "/src/**",
   "/tests/**",
+  "/examples/**",
   "/Cargo.toml",
   "/Cargo.lock",
   "/README.md",
