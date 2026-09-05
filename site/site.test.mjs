@@ -72,25 +72,27 @@ test("the first phone and desktop screens name the job, audience, and sample act
   }
 });
 
-test("phone headers and footers keep route links visible with 44px targets", async () => {
+test("headers and footers keep route links visible with 44px targets", async () => {
   const site = await startSiteServer();
   const browser = await chromium.launch();
   try {
-    for (const route of ["/", "/demo/", "/privacy/", "/terms/", "/a-missing-plan"]) {
-      const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
-      await page.goto(`${site.origin}${route}`);
-      for (const navigation of [page.locator("header nav"), page.locator("footer nav")]) {
-        const links = navigation.locator("a");
-        assert.ok(await links.count() >= 3, `${route} exposes route links`);
-        for (let index = 0; index < await links.count(); index += 1) {
-          const link = links.nth(index);
-          assert.equal(await link.isVisible(), true, `${route} link ${index} is visible`);
-          const box = await link.boundingBox();
-          assert.ok(box && box.width >= 44 && box.height >= 44, `${route} link ${index} is at least 44 by 44px`);
+    for (const viewport of [{ width: 390, height: 844 }, { width: 1440, height: 1000 }]) {
+      for (const route of ["/", "/demo/", "/privacy/", "/terms/", "/a-missing-plan"]) {
+        const page = await browser.newPage({ viewport });
+        await page.goto(`${site.origin}${route}`);
+        for (const navigation of [page.locator("header nav"), page.locator("footer nav")]) {
+          const links = navigation.locator("a");
+          assert.ok(await links.count() >= 3, `${route} exposes route links`);
+          for (let index = 0; index < await links.count(); index += 1) {
+            const link = links.nth(index);
+            assert.equal(await link.isVisible(), true, `${route} link ${index} is visible`);
+            const box = await link.boundingBox();
+            assert.ok(box && box.width >= 44 && box.height >= 44, `${route} link ${index} is at least 44 by 44px`);
+          }
         }
+        assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth), true);
+        await page.close();
       }
-      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth), true);
-      await page.close();
     }
   } finally {
     await browser.close();
