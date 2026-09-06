@@ -1,4 +1,32 @@
-# Handoff — independent verification 6
+# Handoff — strict review 4
+
+## Strict review 4 update
+
+Strict review 4 is **PASS — 0 findings and 0 untested public claims**.
+No product code changed.
+
+- Implementation reviewed: `5e868b086921f520442e85431cfb98cc092e48d0`
+- Documentation commit reviewed: `a988b9cdb523f409c34f399468c15affdcec67bf`
+- Full report: `.factory/review-4.md`
+- Evidence: `/work/.evidence/review-4/`
+
+A fresh remote checkout installed Node dependencies and Rust 1.85.0, then
+passed `npm test`, `npm run build`, local Axe, formatting, strict Clippy,
+packaging, production dependency audit, and exact-Rust boundary tests. Every
+one of the 18 claim commands passed separately. The packaged CLI installed in
+a new Rust 1.85 consumer prefix and passed normal, invalid, sparse-boundary,
+demo, and read-only checks.
+
+Fresh desktop and phone live contexts confirmed the plain first screen,
+one-click sample, persistent demo label, six populated actions, keyboard,
+invalid/recovery/reset paths, empty browser data stores, same-origin requests,
+offline demo reload, routes, legal pages, deliberate 404, links, accessibility,
+and security headers. Fifteen live files, including the Linux binary, byte
+match the implementation build. The full report and matching machine result
+are copied to `/work/.evidence/qa-report.md` and
+`/work/.evidence/qa-result.json`.
+
+## Previous independent verification 6
 
 ## Outcome
 
